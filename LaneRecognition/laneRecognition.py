@@ -51,7 +51,7 @@ if (True):
             'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Opening Mean','Opening Gaussian']
 	images = [frame, gray, blurred, threshMean, threshGaussian, openingMean, openingGaussian]
 	for i in range(7):
-	    plt.subplot(9,9,i+1),plt.imshow(images[i],'gray')
+	    plt.subplot(3,3,i+1),plt.imshow(images[i],'gray')
 	    plt.title(titles[i])
 	    plt.xticks([]),plt.yticks([])
 	plt.show()
