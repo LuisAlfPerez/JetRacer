@@ -45,7 +45,7 @@ if (True):
 	blurredGaussian = cv2.GaussianBlur(gray, (9, 9), 0)
 	threshMean = cv2.adaptiveThreshold(blurredMean, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 25, 8)
 	threshGaussian = cv2.adaptiveThreshold(blurredGaussian,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,49,8)
-	kernel = numpy.ones((25,25),numpy.uint8)
+	kernel = numpy.ones((50,50),numpy.uint8)
 	openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernel)
 	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernel)
 	titles = ['Original Image', 'Gray',
