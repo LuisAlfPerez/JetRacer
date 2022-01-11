@@ -1,6 +1,6 @@
 import nanocamera
 import cv2
-camera = nanocamera.Camera(flip=0, width=1280, height=800, fps=30)
+camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER
 #frame = camera.read()
 while(True):
 	ret, frame = camera.read()
