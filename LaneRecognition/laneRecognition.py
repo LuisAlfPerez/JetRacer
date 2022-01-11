@@ -43,9 +43,9 @@ while(True):
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	blurred = cv2.GaussianBlur(gray, (7, 7), 0)
 	threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 21, 10)
-	threshGaussian = cv2.adaptiveThreshold(blurred,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,11,2)
-	openingMean = cv2.morphologyEx(threshMean, cv.MORPH_OPEN, kernel)
-	openingGaussian = cv2.morphologyEx(threshGaussian, cv.MORPH_OPEN, kernel)
+	threshGaussian = cv2.adaptiveThreshold(blurred,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,2)
+	openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernel)
+	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernel)
 	titles = ['Original Image', 'Gray',
             'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Opening Mean','Opening Gaussian']
 	images = [frame, gray, blurred, threshMean, threshGaussian, openingMean, openingGaussian]
