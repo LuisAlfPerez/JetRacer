@@ -48,15 +48,18 @@ if (True):
 	kernelErosion = numpy.ones((3,3),numpy.uint8)
 	erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 1)
 	erosionGaussian = cv2.erode(threshGaussian,kernelErosion,iterations = 1)
-	kernelOpening = numpy.ones((35,35),numpy.uint8)
+	kernelErosion = numpy.ones((7,7),numpy.uint8)
+	dilateMean = cv2.dilate(erosionMean,kernelErosion,iterations = 1)
+	dilateGaussian = cv2.dilate(erosionGaussian,kernelErosion,iterations = 1)
+	kernelOpening = numpy.ones((3,3),numpy.uint8)
 	openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
 	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernelOpening)
 	titles = ['Original Image', 'Gray',
-            'GaussianBlur', 'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Erosion Mean','Erosion Gaussian','Opening Mean','Opening Gaussian']
-	images = [frame, gray, blurredMean, blurredGaussian, threshMean, threshGaussian, erosionMean, erosionGaussian, openingMean, openingGaussian]
+            'GaussianBlur', 'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Erosion Mean','Erosion Gaussian','Dilate Mean','Dilate Gaussian','Opening Mean','Opening Gaussian']
+	images = [frame, gray, blurredMean, blurredGaussian, threshMean, threshGaussian, erosionMean, erosionGaussian,dilateMean,dilateGaussian, openingMean, openingGaussian]
 	plt.figure('JetRacer Camera')
-	for i in range(10):
-	    plt.subplot(5,2,i+1),plt.imshow(images[i],'gray')
+	for i in range(12):
+	    plt.subplot(6,2,i+1),plt.imshow(images[i],'gray')
 	    plt.title(titles[i])
 	    plt.xticks([]),plt.yticks([])
 	plt.show()
