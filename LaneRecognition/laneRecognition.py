@@ -38,10 +38,10 @@ def gallery(array, ncols=3):
     return result
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 #frame = camera.read()
-while(True):
+if (True):
 	ret, frame = camera.read()
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-	blurred = cv2.GaussianBlur(gray, (7, 7), 0)
+	blurred = cv2.GaussianBlur(gray, (10, 10), 0)
 	threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 21, 10)
 	threshGaussian = cv2.adaptiveThreshold(blurred,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,2)
 	kernel = numpy.ones((10,10),numpy.uint8)
