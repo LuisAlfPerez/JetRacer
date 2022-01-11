@@ -55,6 +55,7 @@ if (True):
 	    plt.subplot(4,2,i+1),plt.imshow(images[i],'gray')
 	    plt.title(titles[i])
 	    plt.xticks([]),plt.yticks([])
+	plt.figure('JetRacer Camera')
 	plt.show()
 	#cv2.imshow('JetRacer Camera', plt)
 camera.release()
