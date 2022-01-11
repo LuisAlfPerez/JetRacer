@@ -53,7 +53,7 @@ if (True):
 	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernelOpening)
 	titles = ['Original Image', 'Gray',
             'GaussianBlur', 'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Erosion Mean','Erosion Gaussian','Opening Mean','Opening Gaussian']
-	images = [frame, gray, blurredMean, blurredGaussian, threshMean, threshGaussian, openingMean, openingGaussian]
+	images = [frame, gray, blurredMean, blurredGaussian, threshMean, threshGaussian, erosionMean, erosionGaussian, openingMean, openingGaussian]
 	plt.figure('JetRacer Camera')
 	for i in range(10):
 	    plt.subplot(5,2,i+1),plt.imshow(images[i],'gray')
