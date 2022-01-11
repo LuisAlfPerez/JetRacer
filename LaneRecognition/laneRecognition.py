@@ -57,7 +57,5 @@ if (True):
 	    plt.xticks([]),plt.yticks([])
 	plt.show()
 	#cv2.imshow('JetRacer Camera', plt)
-	#if cv2.waitKey(1) & 0xFF == ord('q'):
-    		#break
 camera.release()
 cv2.destroyAllWindows()
