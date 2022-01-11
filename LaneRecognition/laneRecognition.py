@@ -45,15 +45,18 @@ if (True):
 	blurredGaussian = cv2.GaussianBlur(gray, (9, 9), 0)
 	threshMean = cv2.adaptiveThreshold(blurredMean, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 25, 8)
 	threshGaussian = cv2.adaptiveThreshold(blurredGaussian,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,49,8)
-	kernel = numpy.ones((50,50),numpy.uint8)
-	openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernel)
-	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernel)
+	kernelErosion = np.ones((5,5),np.uint8)
+	erosionMean = cv.erode(threshMean,kernelErosion,iterations = 1)
+	erosionGaussian = cv.erode(threshGaussian,kernelErosion,iterations = 1)
+	kernelOpening = numpy.ones((35,35),numpy.uint8)
+	openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
+	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernelOpening)
 	titles = ['Original Image', 'Gray',
-            'GaussianBlur', 'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Opening Mean','Opening Gaussian']
+            'GaussianBlur', 'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Erosion Mean','Erosion Gaussian','Opening Mean','Opening Gaussian']
 	images = [frame, gray, blurredMean, blurredGaussian, threshMean, threshGaussian, openingMean, openingGaussian]
 	plt.figure('JetRacer Camera')
-	for i in range(8):
-	    plt.subplot(4,2,i+1),plt.imshow(images[i],'gray')
+	for i in range(10):
+	    plt.subplot(5,2,i+1),plt.imshow(images[i],'gray')
 	    plt.title(titles[i])
 	    plt.xticks([]),plt.yticks([])
 	plt.show()
