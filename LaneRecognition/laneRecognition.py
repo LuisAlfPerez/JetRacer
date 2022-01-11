@@ -43,14 +43,14 @@ if (True):
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	blurredMean = cv2.GaussianBlur(gray, (9, 9), 0)
 	blurredGaussian = cv2.GaussianBlur(gray, (9, 9), 0)
-	threshMean = cv2.adaptiveThreshold(blurredMean, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 25, 8)
-	threshGaussian = cv2.adaptiveThreshold(blurredGaussian,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,49,8)
-	kernelErosion = numpy.ones((25,25),numpy.uint8)
+	threshMean = cv2.adaptiveThreshold(blurredMean, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
+	threshGaussian = cv2.adaptiveThreshold(blurredGaussian,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,49,8)
+	kernelErosion = numpy.ones((15,15),numpy.uint8)
 	erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 1)
 	erosionGaussian = cv2.erode(threshGaussian,kernelErosion,iterations = 1)
 	kernelOpening = numpy.ones((35,35),numpy.uint8)
-	openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
-	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernelOpening)
+	openingMean = cv2.morphologyEx(erosionMean, cv2.MORPH_OPEN, kernelOpening)
+	openingGaussian = cv2.morphologyEx(erosionGaussian, cv2.MORPH_OPEN, kernelOpening)
 	titles = ['Original Image', 'Gray',
             'GaussianBlur', 'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Erosion Mean','Erosion Gaussian','Opening Mean','Opening Gaussian']
 	images = [frame, gray, blurredMean, blurredGaussian, threshMean, threshGaussian, erosionMean, erosionGaussian, openingMean, openingGaussian]
