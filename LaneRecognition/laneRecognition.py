@@ -49,10 +49,10 @@ if (True):
 	openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernel)
 	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernel)
 	titles = ['Original Image', 'Gray',
-            'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Opening Mean','Opening Gaussian']
-	images = [frame, gray, blurred, threshMean, threshGaussian, openingMean, openingGaussian]
-	for i in range(7):
-	    plt.subplot(3,3,i+1),plt.imshow(images[i],'gray')
+            'GaussianBlur', 'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Opening Mean','Opening Gaussian']
+	images = [frame, gray, blurredMean, blurredGaussian, threshMean, threshGaussian, openingMean, openingGaussian]
+	for i in range(8):
+	    plt.subplot(4,2,i+1),plt.imshow(images[i],'gray')
 	    plt.title(titles[i])
 	    plt.xticks([]),plt.yticks([])
 	plt.show()
