@@ -40,7 +40,7 @@ camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 #frame = camera.read()
 while(True):
 	ret, frame = camera.read()
-	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	blurred = cv2.GaussianBlur(gray, (7, 7), 0)
 	threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 21, 10)
 	threshGaussian = cv.adaptiveThreshold(blurred,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,11,2)
