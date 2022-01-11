@@ -51,11 +51,11 @@ if (True):
 	titles = ['Original Image', 'Gray',
             'GaussianBlur', 'GaussianBlur', 'Adaptive Mean Thresholding', 'Adaptive Gaussian Thresholding','Opening Mean','Opening Gaussian']
 	images = [frame, gray, blurredMean, blurredGaussian, threshMean, threshGaussian, openingMean, openingGaussian]
+	plt.figure('JetRacer Camera')
 	for i in range(8):
 	    plt.subplot(4,2,i+1),plt.imshow(images[i],'gray')
 	    plt.title(titles[i])
 	    plt.xticks([]),plt.yticks([])
-	plt.figure('JetRacer Camera')
 	plt.show()
 	#cv2.imshow('JetRacer Camera', plt)
 camera.release()
