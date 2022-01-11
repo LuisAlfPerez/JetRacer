@@ -48,7 +48,7 @@ if (True):
 	kernelErosion = numpy.ones((2,2),numpy.uint8)
 	erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
 	erosionGaussian = cv2.erode(threshGaussian,kernelErosion,iterations = 1)
-	kernelDilate = numpy.ones((15,15),numpy.uint8)
+	kernelDilate = numpy.ones((25,25),numpy.uint8)
 	dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
 	dilateGaussian = cv2.dilate(erosionGaussian,kernelDilate,iterations = 1)
 	kernelOpening = numpy.ones((3,3),numpy.uint8)
