@@ -54,7 +54,8 @@ while(True):
 	    plt.subplot(3,3,i+1),plt.imshow(images[i],'gray')
 	    plt.title(titles[i])
 	    plt.xticks([]),plt.yticks([])
-	cv2.imshow('JetRacer Camera', plt)
+	plt.show()
+	#cv2.imshow('JetRacer Camera', plt)
 	if cv2.waitKey(1) & 0xFF == ord('q'):
     		break
 camera.release()
