@@ -44,7 +44,7 @@ if (True):
 	blurredMean = cv2.GaussianBlur(gray, (9, 9), 0)
 	blurredGaussian = cv2.GaussianBlur(gray, (9, 9), 0)
 	threshMean = cv2.adaptiveThreshold(blurredMean, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 21, 10)
-	threshGaussian = cv2.adaptiveThreshold(blurredGaussian,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,21,5)
+	threshGaussian = cv2.adaptiveThreshold(blurredGaussian,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,21,7)
 	kernel = numpy.ones((10,10),numpy.uint8)
 	openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernel)
 	openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernel)
