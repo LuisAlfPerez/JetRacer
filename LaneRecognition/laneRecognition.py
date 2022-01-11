@@ -47,7 +47,7 @@ if (True):
 	threshGaussian = cv2.adaptiveThreshold(blurredGaussian,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,49,8)
 	kernelErosion = numpy.ones((2,2),numpy.uint8)
 	erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
-	erosionGaussian = cv2.erode(threshGaussian,kernelErosion,iterations = 4)
+	erosionGaussian = cv2.erode(threshGaussian,kernelErosion,iterations = 3)
 	kernelDilate = numpy.ones((15,15),numpy.uint8)
 	dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
 	dilateGaussian = cv2.dilate(erosionGaussian,kernelDilate,iterations = 1)
