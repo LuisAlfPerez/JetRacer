@@ -43,15 +43,15 @@ def show_camera():
     if cap.isOpened():
         date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
         ret_val, img = cap.read()
-        cv2.imwrite(date_time, img)
+        cv2.imwrite(os.getcwd()+date_time+".jpg", img)
         time.sleep(1)
         date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
         ret_val, img = cap.read()
-        cv2.imwrite(date_time, img)
+        cv2.imwrite(os.getcwd()+date_time+".jpg", img)
         time.sleep(1)
         date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
         ret_val, img = cap.read()
-        cv2.imwrite(date_time, img)
+        cv2.imwrite(os.getcwd()+date_time+".jpg", img)
         cap.release()
         cv2.destroyAllWindows()
     else:
