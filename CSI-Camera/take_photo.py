@@ -41,18 +41,18 @@ def show_camera():
     cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
     now = datetime.now()
     if cap.isOpened():
-        time.sleep(1)
-        date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
-        ret_val, img = cap.read()
-        cv2.imwrite(date_time+".jpg", img)
-        time.sleep(1)
-        date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
-        ret_val, img = cap.read()
-        cv2.imwrite(date_time+".jpg", img)
-        time.sleep(1)
-        date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
-        ret_val, img = cap.read()
-        cv2.imwrite(date_time+".jpg", img)
+        window_handle = cv2.namedWindow("CSI Camera", cv2.WINDOW_AUTOSIZE)
+        # Window
+        while cv2.getWindowProperty("CSI Camera", 0) >= 0:
+            ret_val, img = cap.read()
+            cv2.imshow("CSI Camera", img)
+            date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
+            cv2.imwrite(date_time+".jpg", img)
+            # This also acts as
+            keyCode = cv2.waitKey(30) & 0xFF
+            # Stop the program on the ESC key
+            if keyCode == 27:
+                break
         cap.release()
         cv2.destroyAllWindows()
     else:
