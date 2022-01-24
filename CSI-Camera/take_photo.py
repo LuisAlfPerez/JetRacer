@@ -47,6 +47,7 @@ def show_camera():
             ret_val, img = cap.read()
             cv2.imshow("CSI Camera", img)
             #time.sleep(3)
+            i = i + 1
             if i == 10:
                 now = datetime.now()
                 date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
