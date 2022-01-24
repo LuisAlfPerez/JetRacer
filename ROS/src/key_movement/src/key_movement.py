@@ -7,7 +7,7 @@ car.steering_gain = 0.5
 car.steering_offset = 0.2
 car.throttle = 0
 car.throttle_gain = 1
-print('ready')
+print('Ready')
 
 def on_press(key):
     try:
@@ -27,7 +27,7 @@ def on_press(key):
             car.throttle = 0
             car.steering = 0
     except AttributeError:
-        print('an error ocurred')
+        print('An error ocurred')
 
 def on_release(key):
     if key == keyboard.Key.esc:
