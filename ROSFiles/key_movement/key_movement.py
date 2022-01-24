@@ -3,8 +3,8 @@ from pynput import keyboard
 
 car = NvidiaRacecar()
 car.steering = 0
-car.steering_gain = 0.5
-car.steering_offset = 0.2
+car.steering_gain = 0.6
+car.steering_offset = 0
 car.throttle = 0
 car.throttle_gain = 1
 print('ready')
