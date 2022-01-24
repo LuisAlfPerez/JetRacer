@@ -12,37 +12,24 @@ print('ready')
 def on_press(key):
     try:
         if key == keyboard.Key.right:
-                #print(car.steering_gain)
-                #print(car.steering_offset)
-                car.steering += .1
-                print(car.steering)
+            car.steering += .1
+            print(car.steering)
         if key == keyboard.Key.left:
-                #print(car.steering_gain)
-                #print(car.steering_offset)
-                car.steering -= .1
-                print(car.steering)
+            car.steering -= .1
+            print(car.steering)
         if key == keyboard.Key.up:
-                #print(car.steering_gain)
-                #print(car.steering_offset)
-                car.throttle -= .1
-                print(car.throttle)
+            car.throttle -= .1
+            print(car.throttle)
         if key == keyboard.Key.down:
-                #print(car.steering_gain)
-                #print(car.steering_offset)
-                car.throttle += .1
-                print(car.throttle)
+            car.throttle += .1
+            print(car.throttle)
         if key == keyboard.Key.space:
-                #print(car.steering_gain)
-                #print(car.steering_offset)
-                car.throttle = 0
-                car.steering = .1
-                print(car.throttle)
+            car.throttle = 0
+            car.steering = 0
     except AttributeError:
-        print('special key pressed: {0}'.format(
-            key))
+        print('an error ocurred')
 
 def on_release(key):
-    #print('Key released: {0}'.format(key))
     if key == keyboard.Key.esc:
         # Stop listener
         return False
