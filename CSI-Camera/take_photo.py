@@ -48,7 +48,7 @@ def show_camera():
             now = datetime.now()
             date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
             cv2.imwrite(date_time+".jpg", img)
-            time.sleep(1)
+            time.sleep(3)
             # This also acts as
             keyCode = cv2.waitKey(30) & 0xFF
             # Stop the program on the ESC key
