@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 from matplotlib import pyplot as plt
 from setupFiles.lineFunction import LineFunction
+#import std_msgs
 import numpy
 import cv2
 import os
@@ -125,6 +128,8 @@ def fillRegion(image, lines, width, height):
                     if x < x2:
                         x2 = x
                         #print(x2)
+        if y = 500:
+            #publisher.publish(int(x2-x1-round(width/2)))
         if y < round(height/2):
             if x1!=0 and x2!=width:
                 #print("x1 =", x1, "x2 =",x2, "y =",y)
@@ -223,6 +228,9 @@ def region_of_interest(imageReceived):
 
 
     
+#publisher = rospy.Publisher('objectiveDistance', Integer, queue_size=2)
+#rospy.init_node('vision', anonymous=True)
+
 
 #camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 image = cv2.imread("01-24-2022_16-10-45.jpg")
@@ -256,7 +264,7 @@ for i in range(7):
     plt.xticks([]),plt.yticks([])
 #plt.show()
 #plt.show()
-
+"""
 #GAUSSIAN
 threshGaussian = cv2.adaptiveThreshold(blurred,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,49,8)
 erosionGaussian = cv2.erode(threshGaussian,kernelErosion,iterations = 3)
@@ -288,4 +296,5 @@ for i in range(4):
 #plt.show()
 #cv2.imshow('JetRacer Camera', plt)
 #camera.release()
+"""
 cv2.destroyAllWindows()
