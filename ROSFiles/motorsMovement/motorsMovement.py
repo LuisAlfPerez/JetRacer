@@ -2,7 +2,7 @@
 
 from setup.nvidia_racecar import NvidiaRacecar
 import rospy
-import std_msgs
+from std_msgs.msg import Float32
 
 def moveSteer(message):
 	car.steering = float(message)/100
@@ -14,14 +14,14 @@ def moveMotor(message):
 
 def listener():
 	rospy.init_node('motors', anonymous=True)
-	rospy.Suscriber("steering", Integer, moveSteer)
-	rospy.Suscriber("motor", Integer, moveMotor)
+	rospy.Subscriber("steering", Float32, moveSteer)
+	rospy.Subscriber("motor", Float32, moveMotor)
 
-if __name___ == '__main__':
-	listener()
-	car = NvidiaRacecar()
-	car.steering = 0
-	car.steering_gain = 0.6
-	car.steering_offset = 0
-	car.throttle = 0
-	car.throttle_gain = 1
+
+listener()
+car = NvidiaRacecar()
+car.steering = 0
+car.steering_gain = 0.6
+car.steering_offset = 0
+car.throttle = 0
+car.throttle_gain = 1
