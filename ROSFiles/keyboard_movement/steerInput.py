@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-from std_msgs.msg import Int8
+from std_msgs.msg import Float32
 import rospy
 
 def publisher():
-	publisher = rospy.Publisher('steering', Int8, queue_size=10)
+	publisher = rospy.Publisher('steering', Float32, queue_size=10)
 	rospy.init_node('steeringWrite', anonymous=True)
 	while not rospy.is_shutdown():
-		val = input("Enter steering value (-100 to 100)")
+		val = input("Enter steering value (-1 to 1)")
 		try:
-			publisher.publish(int(val))
+			publisher.publish(float(val))
 		except:
 			break 
 
