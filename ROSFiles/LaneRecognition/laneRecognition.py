@@ -129,8 +129,6 @@ def fillRegion(image, lines, width, height):
                     if x < x2:
                         x2 = x
                         #print(x2)
-        if y = 500:
-            publisher.publish(int(x2-x1-round(width/2)))
         if y < round(height/2):
             if x1!=0 and x2!=width:
                 #print("x1 =", x1, "x2 =",x2, "y =",y)
