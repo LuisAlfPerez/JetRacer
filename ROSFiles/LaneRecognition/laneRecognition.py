@@ -234,7 +234,7 @@ def region_of_interest(imageReceived):
     """
 
     
-publisher = rospy.Publisher('referenceDistance', Integer, queue_size=1)
+publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
 rospy.init_node('vision', anonymous=True)
 
 # image = cv2.imread("01-24-2022_16-10-45.jpg")
