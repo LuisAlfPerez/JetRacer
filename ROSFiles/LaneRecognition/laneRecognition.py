@@ -157,8 +157,8 @@ def distanceFromReference(lines, width, referenceValue):
     return 
 
 def region_of_interest(imageReceived):
-    height = image.shape[0]
-    width = image.shape[1]
+    height = imageReceived.shape[0]
+    width = imageReceived.shape[1]
     croppedImage = imageReceived[0:height-1, 0:width-130-1]
     width = croppedImage.shape[1]
     fieldView = 60*2.5
