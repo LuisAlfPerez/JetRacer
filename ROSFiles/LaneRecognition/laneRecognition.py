@@ -247,6 +247,7 @@ rospy.init_node('vision', anonymous=True)
 
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 if camera.isOpened():
+    keyCode = 0
     while keyCode != 27:
         # Stop the program on the ESC key
         keyCode = cv2.waitKey(30) & 0xFF
