@@ -239,9 +239,6 @@ def region_of_interest(imageReceived):
 publisher = rospy.Publisher('referenceDistance', Integer, queue_size=1)
 rospy.init_node('vision', anonymous=True)
 
-camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
-ret, frame = camera.read()
-
 # image = cv2.imread("01-24-2022_16-10-45.jpg")
 # #image = cv2.imread("recta2.jpg")
 # #image = cv2.imread("curva2.jpg")
@@ -250,19 +247,27 @@ ret, frame = camera.read()
 # #image = cv2.imread("02-test-edges.png")
 # frame = numpy.copy(image)
 
-gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-blurred = cv2.GaussianBlur(gray, (9, 9), 0)
-kernelErosion = numpy.ones((2,2),numpy.uint8)
-kernelDilate = numpy.ones((15,15),numpy.uint8)
-kernelOpening = numpy.ones((3,3),numpy.uint8)
-    
+camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
+if camera.isOpened():
+    while keyCode != 27:
+        # Stop the program on the ESC key
+        keyCode = cv2.waitKey(30) & 0xFF
+        ret, frame = camera.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.GaussianBlur(gray, (9, 9), 0)
+        kernelErosion = numpy.ones((2,2),numpy.uint8)
+        kernelDilate = numpy.ones((15,15),numpy.uint8)
+        kernelOpening = numpy.ones((3,3),numpy.uint8)
+        
+        #MEAN
+        threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
+        erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
+        dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
+        openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
+        region_of_interest(dilateMean)
+else:
+    print("Camera was not opened")
 
-#MEAN
-threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
-erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
-dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
-openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
-region_of_interest(dilateMean)
 # titles = ['Original Image', 'Gray',
 #         'GaussianBlur','Adaptive Mean Thresholding','Erosion Mean','Dilate Mean','Opening Mean']
 # images = [frame, gray, blurred, threshMean, erosionMean, dilateMean, openingMean]
