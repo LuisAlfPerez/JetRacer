@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-from setup.nvidia_racecar import NvidiaRacecar
 import rospy
 from std_msgs.msg import Int32
+from std_msgs.msg import Float32
 
 publisherMotor = None
 publisherSteering = None
