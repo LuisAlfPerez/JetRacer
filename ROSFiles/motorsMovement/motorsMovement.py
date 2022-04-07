@@ -16,8 +16,10 @@ def listener():
 	rospy.init_node('motors', anonymous=True)
 	rospy.Subscriber("steering", Float32, moveSteer)
 	rospy.Subscriber("motor", Float32, moveMotor)
+	r = rospy.Rate(50) 
+    while not rospy.is_shutdown:
+        r.sleep()
 	rospy.spin()
-	rospy.loginfo("Iniciando3")	
 
 car = NvidiaRacecar()
 car.steering = 0

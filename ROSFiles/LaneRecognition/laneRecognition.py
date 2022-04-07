@@ -2,7 +2,8 @@
 
 from matplotlib import pyplot as plt
 from setupFiles.lineFunction import LineFunction
-#import std_msgs
+import rospy
+from std_msgs.msg import Int32
 import numpy
 import cv2
 import os
@@ -110,7 +111,7 @@ def printLines(image, lines, width, height):
     return lines    
 
 def fillRegion(image, lines, width, height):
-    mask = numpy.zeros_like(image)
+    #mask = numpy.zeros_like(image)
     refx=round(width/2)
     x1=0
     x2=width
@@ -137,6 +138,25 @@ def fillRegion(image, lines, width, height):
         else:
             cv2.line(mask, (x1, y), (x2, y), (255, 255, 255), 1)
     return mask
+
+def distanceFromReference(lines, width, referenceValue):
+    refx=round(width/2)
+    x1=0
+    x2=width
+    y=referenceValue
+    for line in lines:
+        if line.y_min <= y and line.y_max >= y:
+            x = line.calculateXValue(y)
+            #print("x =",x,"y =",y,"min =",line.y_min,"max =",line.y_max, "cond =",x<refx, x<x2)
+            if x < refx:
+                if x > x1:
+                    x1 = x
+            else:
+                if x < x2:
+                    x2 = x
+                    #print(x2)
+    publisher.publish(int(x2-x1-round(width/2)))
+    return 
 
 def region_of_interest(imageReceived):
     height = image.shape[0]
@@ -183,11 +203,14 @@ def region_of_interest(imageReceived):
     minLineLength = 35
     maxLineGap = 50
     tolerance = 50
+    referenceYValue = 500
 
     lineImage = numpy.zeros_like(croppedImage)
     lines1 = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
+
+    distanceFromReference(lines1, width, referenceYValue)
     """
     #20 to 40 cm
     y_begin = 115
@@ -213,7 +236,7 @@ def region_of_interest(imageReceived):
     """
 
     
-publisher = rospy.Publisher('referenceDistance', Integer, queue_size=2)
+publisher = rospy.Publisher('referenceDistance', Integer, queue_size=1)
 rospy.init_node('vision', anonymous=True)
 
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
