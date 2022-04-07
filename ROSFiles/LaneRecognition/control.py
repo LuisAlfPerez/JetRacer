@@ -9,7 +9,7 @@ publisherSteering = None
 
 def determineSteerValue(message):
 	global publisherMotor
-    global publisherSteering
+	global publisherSteering
 	rospy.loginfo("Steering: %d", message.data)
     steering = message.data / 25
     motor = 0.3
@@ -24,7 +24,7 @@ def determineSteerValue(message):
 	
 def listener():
 	global publisherMotor
-    global publisherSteering
+	global publisherSteering
 	publisherMotor = rospy.Publisher('motor', Float32, queue_size=1)
     publisherSteering = rospy.Publisher('steering', Float32, queue_size=1)
 	rospy.init_node('control', anonymous=True)
