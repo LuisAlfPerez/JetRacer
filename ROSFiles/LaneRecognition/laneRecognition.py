@@ -153,6 +153,7 @@ def distanceFromReference(lines, width, referenceValue):
                 if x < x2:
                     x2 = x
                     #print(x2)
+	rospy.loginfo("Distance from reference: %d", int(x2-x1-round(width/2)))
     publisher.publish(int(x2-x1-round(width/2)))
     return 
 
