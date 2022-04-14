@@ -2,8 +2,8 @@
 
 from matplotlib import pyplot as plt
 from setupFiles.lineFunction import LineFunction
-import rospy
-from std_msgs.msg import Int32
+#import rospy
+#from std_msgs.msg import Int32
 import numpy
 import cv2
 import os
@@ -145,6 +145,7 @@ def distanceFromReference(lines, width, referenceValue):
     for line in lines:
         if line.y_min <= y and line.y_max >= y:
             x = line.calculateXValue(y)
+            print(x)
             #print("x =",x,"y =",y,"min =",line.y_min,"max =",line.y_max, "cond =",x<refx, x<x2)
             if x < refx:
                 if x > x1:
@@ -153,8 +154,11 @@ def distanceFromReference(lines, width, referenceValue):
                 if x < x2:
                     x2 = x
                     #print(x2)
-	rospy.loginfo("Distance from reference: %d", int(x2-x1-round(width/2)))
-    publisher.publish(int((x2-x1)/2-round(width/2)))
+    print(x1)
+    print(x2)
+    print(width/2)
+    print("Distance from reference: %d", int(x2-x1-round(width/2)))
+    #publisher.publish(int(x2-x1-round(width/2)))
     return 
 
 def region_of_interest(imageReceived):
@@ -169,74 +173,27 @@ def region_of_interest(imageReceived):
     mask = numpy.zeros_like(croppedImage)
     cv2.fillPoly(mask, numpy.int32([view]), 255)
     croppedImage = cv2.bitwise_and(croppedImage, mask)
-    """
-    #Complete
-    y_begin = 0
-    y_final = height
-    threshold = 300
-    minLineLength = 35
-    maxLineGap = 50
-    tolerance = 50
-    lines = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
-    # lineImage = numpy.zeros_like(croppedImage)
-    # for line in lines:
-    #     x1, y1, x2, y2 = line.reshape(4)
-    #     cv2.line(lineImage, (x1, y1), (x2, y2), (255, 255,255), 2)
-    # lines = cv2.addWeighted(croppedImage, 0.8, lineImage, 1,1)
-    # plt.imshow(lines)
-    # plt.show()
-    if lines is not None: 
-        lines = simplifyLines(lines, 0, width, y_begin, y_final, tolerance)
-    # printLines(croppedImage, lines1)
-    # for line in lines:
-    #     line = line.average(y_begin,y_final)
-    
-    refImage = fillRegion(printLines(croppedImage, lines, width, height), lines, width, height)
-    plt.imshow(refImage)
-    plt.show() 
-    """
-    #0 to 20 cm
+
     y_begin = 250
     y_final = height
     threshold = 300
     minLineLength = 35
     maxLineGap = 50
     tolerance = 50
-    referenceYValue = 500
+    referenceYValue = 400
 
     lineImage = numpy.zeros_like(croppedImage)
     lines1 = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
-
     distanceFromReference(lines1, width, referenceYValue)
-    """
-    #20 to 40 cm
-    y_begin = 115
-    y_final = 250
-    threshold = 100
-    minLineLength = 35
-    maxLineGap = 25
-    tolerance = 100
-    
-    lineImage = numpy.zeros_like(croppedImage)
-    lines2 = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
-    if lines2 is not None: 
-        lines2 = simplifyLines(lines2, 0, width, y_begin, y_final, tolerance)
-    # for line in lines2:
-    #     line.printValues()
-    # printLines(croppedImage, lines2)
-    # for line in lines2:
-    #     line = line.average(y_begin,y_final)
-    #     line.printValues()
-    #printLines(croppedImage, lines2, width, height)
-    lines = lines1 + lines2
-    #printLines(croppedImage, lines, width,  height)
-    """
+    refImage = fillRegion(printLines(croppedImage, lines1, width, height), lines1, width, height)
+    plt.imshow(refImage)
+    plt.show() 
 
     
-publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
-rospy.init_node('vision', anonymous=True)
+#publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
+#rospy.init_node('vision', anonymous=True)
 
 # image = cv2.imread("01-24-2022_16-10-45.jpg")
 # #image = cv2.imread("recta2.jpg")
@@ -245,7 +202,20 @@ rospy.init_node('vision', anonymous=True)
 # #image = cv2.imread("recta.jpg")
 # #image = cv2.imread("02-test-edges.png")
 # frame = numpy.copy(image)
-
+image = cv2.imread("04-14-2022_12-33-02.jpg")
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+blurred = cv2.GaussianBlur(gray, (9, 9), 0)
+kernelErosion = numpy.ones((2,2),numpy.uint8)
+kernelDilate = numpy.ones((15,15),numpy.uint8)
+kernelOpening = numpy.ones((3,3),numpy.uint8)
+        
+#MEAN
+threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
+erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
+dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
+openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
+region_of_interest(dilateMean)
+"""
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 if camera.isOpened():
     keyCode = 0
@@ -267,7 +237,7 @@ if camera.isOpened():
         region_of_interest(dilateMean)
 else:
     print("Camera was not opened")
-
+    """
 # titles = ['Original Image', 'Gray',
 #         'GaussianBlur','Adaptive Mean Thresholding','Erosion Mean','Dilate Mean','Opening Mean']
 # images = [frame, gray, blurred, threshMean, erosionMean, dilateMean, openingMean]
