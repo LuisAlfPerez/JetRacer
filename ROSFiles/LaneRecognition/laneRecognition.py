@@ -34,15 +34,6 @@ def gstreamer_pipeline(
             display_height,
         )
     )
-def gallery(array, ncols=3):
-    nindex, height, width, intensity = array.shape
-    nrows = nindex//ncols
-    assert nindex == nrows*ncols
-    # want result.shape = (height*nrows, width*ncols, intensity)
-    result = (array.reshape(nrows, ncols, height, width, intensity)
-              .swapaxes(1,2)
-              .reshape(height*nrows, width*ncols, intensity))
-    return result
 
 def lineDetection(image, y_begin, y_final, width, threshold, minLineLength, maxLineGap):
     #Threshold: The minimum number of intersections to "*detect*" a line
@@ -67,7 +58,6 @@ def simplifyLines(lines, x_begin, x_final, y_begin, y_final, tolerance):
                         if abs(searchingFunction.calculateYValue(x_begin)-savedLines.calculateYValue(x_begin))<=tolerance and abs(searchingFunction.calculateYValue(x_final)-savedLines.calculateYValue(x_final))<=tolerance:
                             found = True
                             savedLines.checkMinAndMax(searchingFunction, y_begin, y_final)
-                            #"""
                     elif abs(searchingFunction.slope) > 1:
                         if abs(searchingFunction.calculateYValue(x_begin)-savedLines.calculateYValue(x_begin))<=tolerance*2 and abs(searchingFunction.calculateYValue(x_final)-savedLines.calculateYValue(x_final))<=tolerance*2:
                             found = True
@@ -76,7 +66,6 @@ def simplifyLines(lines, x_begin, x_final, y_begin, y_final, tolerance):
                         if abs(searchingFunction.calculateXValue(y_begin)-savedLines.calculateXValue(y_begin))<=tolerance*2 and abs(searchingFunction.calculateXValue(y_final)-savedLines.calculateXValue(y_final))<=tolerance*2:
                             found = True
                             savedLines.checkMinAndMax(searchingFunction, y_begin, y_final)
-                    #"""
                     else :
                         if abs(searchingFunction.calculateXValue(y_begin)-savedLines.calculateXValue(y_begin))<=tolerance*4 and abs(searchingFunction.calculateXValue(y_final)-savedLines.calculateXValue(y_final))<=tolerance*4:
                             found = True
@@ -88,10 +77,7 @@ def simplifyLines(lines, x_begin, x_final, y_begin, y_final, tolerance):
                 newLines.append(new_line)
     straightLines = []
     for line in newLines:
-        #print()
-        #print(line.slope)
         if abs(line.slope) > 0.25:
-            #print("se guarda")
             straightLines.append(line)
     return straightLines
 
@@ -111,7 +97,6 @@ def printLines(image, lines, width, height):
     return lines    
 
 def fillRegion(image, lines, width, height):
-    #mask = numpy.zeros_like(image)
     refx=round(width/2)
     x1=0
     x2=width
@@ -121,17 +106,14 @@ def fillRegion(image, lines, width, height):
         for line in lines:
             if line.y_min <= y and line.y_max >= y:
                 x = line.calculateXValue(y)
-                #print("x =",x,"y =",y,"min =",line.y_min,"max =",line.y_max, "cond =",x<refx, x<x2)
                 if x < refx:
                     if x > x1:
                         x1 = x
                 else:
                     if x < x2:
                         x2 = x
-                        #print(x2)
         if y < round(height/2):
             if x1!=0 and x2!=width:
-                #print("x1 =", x1, "x2 =",x2, "y =",y)
                 cv2.line(mask, (x1, y), (x2, y), (255, 255, 255), 1)
         else:
             cv2.line(mask, (x1, y), (x2, y), (255, 255, 255), 1)
@@ -145,15 +127,13 @@ def distanceFromReference(lines, width, referenceValue):
     for line in lines:
         if line.y_min <= y and line.y_max >= y:
             x = line.calculateXValue(y)
-            #print("x =",x,"y =",y,"min =",line.y_min,"max =",line.y_max, "cond =",x<refx, x<x2)
             if x < refx:
                 if x > x1:
                     x1 = x
             else:
                 if x < x2:
                     x2 = x
-                    #print(x2)
-	rospy.loginfo("Distance from reference: %d", int(x2-x1-round(width/2)))
+    rospy.loginfo("Distance from reference: %d", int((x2-x1)/2-round(width/2)))
     publisher.publish(int((x2-x1)/2-round(width/2)))
     return 
 
@@ -162,89 +142,23 @@ def region_of_interest(imageReceived):
     width = imageReceived.shape[1]
     croppedImage = imageReceived[0:height-1, 0:width-130-1]
     width = croppedImage.shape[1]
-    fieldView = 60*2.5
-    view = numpy.array([
-        [(0,200),(width/2-fieldView, 0),(width/2+fieldView, 0),(width,200),(width, height),(0, height)]
-        ])
-    mask = numpy.zeros_like(croppedImage)
-    cv2.fillPoly(mask, numpy.int32([view]), 255)
-    croppedImage = cv2.bitwise_and(croppedImage, mask)
-    """
-    #Complete
-    y_begin = 0
-    y_final = height
+
+    y_begin = 150
+    y_final = 500
     threshold = 300
     minLineLength = 35
     maxLineGap = 50
     tolerance = 50
-    lines = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
-    # lineImage = numpy.zeros_like(croppedImage)
-    # for line in lines:
-    #     x1, y1, x2, y2 = line.reshape(4)
-    #     cv2.line(lineImage, (x1, y1), (x2, y2), (255, 255,255), 2)
-    # lines = cv2.addWeighted(croppedImage, 0.8, lineImage, 1,1)
-    # plt.imshow(lines)
-    # plt.show()
-    if lines is not None: 
-        lines = simplifyLines(lines, 0, width, y_begin, y_final, tolerance)
-    # printLines(croppedImage, lines1)
-    # for line in lines:
-    #     line = line.average(y_begin,y_final)
-    
-    refImage = fillRegion(printLines(croppedImage, lines, width, height), lines, width, height)
-    plt.imshow(refImage)
-    plt.show() 
-    """
-    #0 to 20 cm
-    y_begin = 250
-    y_final = height
-    threshold = 300
-    minLineLength = 35
-    maxLineGap = 50
-    tolerance = 50
-    referenceYValue = 500
+    referenceYValue = 400
 
     lineImage = numpy.zeros_like(croppedImage)
     lines1 = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
-
-    distanceFromReference(lines1, width, referenceYValue)
-    """
-    #20 to 40 cm
-    y_begin = 115
-    y_final = 250
-    threshold = 100
-    minLineLength = 35
-    maxLineGap = 25
-    tolerance = 100
-    
-    lineImage = numpy.zeros_like(croppedImage)
-    lines2 = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
-    if lines2 is not None: 
-        lines2 = simplifyLines(lines2, 0, width, y_begin, y_final, tolerance)
-    # for line in lines2:
-    #     line.printValues()
-    # printLines(croppedImage, lines2)
-    # for line in lines2:
-    #     line = line.average(y_begin,y_final)
-    #     line.printValues()
-    #printLines(croppedImage, lines2, width, height)
-    lines = lines1 + lines2
-    #printLines(croppedImage, lines, width,  height)
-    """
-
+        distanceFromReference(lines1, width, referenceYValue)
     
 publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
 rospy.init_node('vision', anonymous=True)
-
-# image = cv2.imread("01-24-2022_16-10-45.jpg")
-# #image = cv2.imread("recta2.jpg")
-# #image = cv2.imread("curva2.jpg")
-# image = cv2.imread("curva.jpg")
-# #image = cv2.imread("recta.jpg")
-# #image = cv2.imread("02-test-edges.png")
-# frame = numpy.copy(image)
 
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 if camera.isOpened():
@@ -268,48 +182,4 @@ if camera.isOpened():
 else:
     print("Camera was not opened")
 
-# titles = ['Original Image', 'Gray',
-#         'GaussianBlur','Adaptive Mean Thresholding','Erosion Mean','Dilate Mean','Opening Mean']
-# images = [frame, gray, blurred, threshMean, erosionMean, dilateMean, openingMean]
-# plt.figure('JetRacer Camera')
-# for i in range(7):
-#     plt.subplot(3,3,i+1),plt.imshow(images[i],'gray')
-#     plt.title(titles[i])
-#     plt.xticks([]),plt.yticks([])
-#plt.show()
-#plt.show()
-
-"""
-#GAUSSIAN
-threshGaussian = cv2.adaptiveThreshold(blurred,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,49,8)
-erosionGaussian = cv2.erode(threshGaussian,kernelErosion,iterations = 3)
-dilateGaussian = cv2.dilate(erosionGaussian,kernelDilate,iterations = 1)
-openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernelOpening)
-titles = ['Original Image', 'Gray',
-        'GaussianBlur','Adaptive Gaussian Thresholding','Erosion Gaussian','Dilate Gaussian','Opening Gaussian']
-images = [frame, gray, blurred, threshGaussian, erosionGaussian, dilateGaussian, openingGaussian]
-plt.figure('JetRacer Camera')
-for i in range(7):
-    plt.subplot(3,3,i+1),plt.imshow(images[i],'gray')
-    plt.title(titles[i])
-    plt.xticks([]),plt.yticks([])
-#plt.show()
-
-#CANNY
-canny = cv2.Canny(blurred, 50, 75)
-#plt.imshow(canny)
-#plt.show() 
-#region_of_interest(canny)
-titles = ['Original Image', 'Gray',
-        'GaussianBlur','Canny']
-images = [frame, gray, blurred, canny]
-plt.figure('JetRacer Camera')
-for i in range(4):
-    plt.subplot(2,2,i+1),plt.imshow(images[i],'gray')
-    plt.title(titles[i])
-    plt.xticks([]),plt.yticks([])
-#plt.show()
-#cv2.imshow('JetRacer Camera', plt)
-#camera.release()
-"""
 cv2.destroyAllWindows()
