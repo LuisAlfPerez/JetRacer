@@ -10,9 +10,9 @@ publisherSteering = None
 def determineSteerValue(message):
 	global publisherMotor
 	global publisherSteering
-	rospy.loginfo("Steering: %d", message.data)
 	steering = message.data / 25
-	motor = 0.3
+	rospy.loginfo("Steering: %d", steering)
+	motor = -0.3
 	if steering > 1:
 		steering = 1
 	if steering < -1:

@@ -34,15 +34,6 @@ def gstreamer_pipeline(
             display_height,
         )
     )
-def gallery(array, ncols=3):
-    nindex, height, width, intensity = array.shape
-    nrows = nindex//ncols
-    assert nindex == nrows*ncols
-    # want result.shape = (height*nrows, width*ncols, intensity)
-    result = (array.reshape(nrows, ncols, height, width, intensity)
-              .swapaxes(1,2)
-              .reshape(height*nrows, width*ncols, intensity))
-    return result
 
 def lineDetection(image, y_begin, y_final, width, threshold, minLineLength, maxLineGap):
     #Threshold: The minimum number of intersections to "*detect*" a line
@@ -57,6 +48,7 @@ def lineDetection(image, y_begin, y_final, width, threshold, minLineLength, maxL
 
 def simplifyLines(lines, x_begin, x_final, y_begin, y_final, tolerance):
     newLines = []
+    #print(lines.shape[0])
     for line in lines:
             x1, y1, x2, y2 = line.reshape(4)
             if newLines is not None:
@@ -111,7 +103,9 @@ def printLines(image, lines, width, height):
     return lines    
 
 def fillRegion(image, lines, width, height):
-    #mask = numpy.zeros_like(image)
+    if lines is None:
+        return
+    mask = numpy.zeros_like(image)
     refx=round(width/2)
     x1=0
     x2=width
@@ -138,6 +132,8 @@ def fillRegion(image, lines, width, height):
     return mask
 
 def distanceFromReference(lines, width, referenceValue):
+    if lines is None:
+        return
     refx=round(width/2)
     x1=0
     x2=width
@@ -145,7 +141,7 @@ def distanceFromReference(lines, width, referenceValue):
     for line in lines:
         if line.y_min <= y and line.y_max >= y:
             x = line.calculateXValue(y)
-            print(x)
+            # print(x)
             #print("x =",x,"y =",y,"min =",line.y_min,"max =",line.y_max, "cond =",x<refx, x<x2)
             if x < refx:
                 if x > x1:
@@ -154,10 +150,10 @@ def distanceFromReference(lines, width, referenceValue):
                 if x < x2:
                     x2 = x
                     #print(x2)
-    print(x1)
-    print(x2)
-    print(width/2)
-    print("Distance from reference: %d", int(x2-x1-round(width/2)))
+    # print(x1)
+    # print(x2)
+    # print(width/2)
+    print("Left: ", int(x1), " Right: ", int(x2), "Center", int(width/2), " Distance from reference: ", int((x2+x1)/2-round(width/2)))
     #publisher.publish(int(x2-x1-round(width/2)))
     return 
 
@@ -166,16 +162,16 @@ def region_of_interest(imageReceived):
     width = imageReceived.shape[1]
     croppedImage = imageReceived[0:height-1, 0:width-130-1]
     width = croppedImage.shape[1]
-    fieldView = 60*2.5
-    view = numpy.array([
-        [(0,200),(width/2-fieldView, 0),(width/2+fieldView, 0),(width,200),(width, height),(0, height)]
-        ])
-    mask = numpy.zeros_like(croppedImage)
-    cv2.fillPoly(mask, numpy.int32([view]), 255)
-    croppedImage = cv2.bitwise_and(croppedImage, mask)
+    # fieldView = 60*2.5
+    # view = numpy.array([
+    #     [(0,200),(width/2-fieldView, 0),(width/2+fieldView, 0),(width,200),(width, height),(0, height)]
+    #     ])
+    # mask = numpy.zeros_like(croppedImage)
+    # cv2.fillPoly(mask, numpy.int32([view]), 255)
+    # croppedImage = cv2.bitwise_and(croppedImage, mask)
 
-    y_begin = 250
-    y_final = height
+    y_begin = 150
+    y_final = 500
     threshold = 300
     minLineLength = 35
     maxLineGap = 50
@@ -189,20 +185,36 @@ def region_of_interest(imageReceived):
     distanceFromReference(lines1, width, referenceYValue)
     refImage = fillRegion(printLines(croppedImage, lines1, width, height), lines1, width, height)
     plt.imshow(refImage)
-    plt.show() 
+    #plt.show() 
 
     
 #publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
 #rospy.init_node('vision', anonymous=True)
 
-# image = cv2.imread("01-24-2022_16-10-45.jpg")
-# #image = cv2.imread("recta2.jpg")
-# #image = cv2.imread("curva2.jpg")
-# image = cv2.imread("curva.jpg")
-# #image = cv2.imread("recta.jpg")
-# #image = cv2.imread("02-test-edges.png")
-# frame = numpy.copy(image)
+#image = cv2.imread("01-24-2022_16-10-45.jpg")
+#image = cv2.imread("recta2.jpg")
+#image = cv2.imread("curva.jpg")
+
+#Recta
 image = cv2.imread("04-14-2022_12-33-02.jpg")
+#Curva izquierda
+#image = cv2.imread("04-23-2022_14-39-19.jpg")
+#Curva derecha
+#image = cv2.imread("04-23-2022_14-40-01.jpg")
+#Recta visión digonal
+#image = cv2.imread("04-23-2022_14-42-23.jpg")
+#Curva izquierda en U
+#image = cv2.imread("04-23-2022_14-43-01.jpg")
+#image = cv2.imread("04-23-2022_14-43-35.jpg")
+#image = cv2.imread("04-23-2022_14-43-54.jpg")
+#image = cv2.imread("04-23-2022_14-44-11.jpg")
+#S derecha
+#image = cv2.imread("04-23-2022_14-44-37.jpg")
+#image = cv2.imread("04-23-2022_14-44-57.jpg")
+image = cv2.imread("04-28-2022_23-56-06.jpg")
+
+frame = numpy.copy(image)
+
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (9, 9), 0)
 kernelErosion = numpy.ones((2,2),numpy.uint8)
@@ -238,15 +250,14 @@ if camera.isOpened():
 else:
     print("Camera was not opened")
     """
-# titles = ['Original Image', 'Gray',
-#         'GaussianBlur','Adaptive Mean Thresholding','Erosion Mean','Dilate Mean','Opening Mean']
-# images = [frame, gray, blurred, threshMean, erosionMean, dilateMean, openingMean]
-# plt.figure('JetRacer Camera')
-# for i in range(7):
-#     plt.subplot(3,3,i+1),plt.imshow(images[i],'gray')
-#     plt.title(titles[i])
-#     plt.xticks([]),plt.yticks([])
-#plt.show()
+titles = ['Original Image', 'Gray',
+        'GaussianBlur','Adaptive Mean Thresholding','Erosion Mean','Dilate Mean','Opening Mean']
+images = [frame, gray, blurred, threshMean, erosionMean, dilateMean, openingMean]
+plt.figure('JetRacer Camera')
+for i in range(6):
+    plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
+    plt.title(titles[i])
+    plt.xticks([]),plt.yticks([])
 #plt.show()
 
 """
