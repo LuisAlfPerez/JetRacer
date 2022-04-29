@@ -133,8 +133,8 @@ def distanceFromReference(lines, width, referenceValue):
             else:
                 if x < x2:
                     x2 = x
-    rospy.loginfo("Distance from reference: %d", int((x2-x1)/2-round(width/2)))
-    publisher.publish(int((x2-x1)/2-round(width/2)))
+    rospy.loginfo("Distance from reference: %d", int((x2+x1)/2-round(width/2)))
+    publisher.publish(int((x2+x1)/2-round(width/2)))
     return 
 
 def region_of_interest(imageReceived):
