@@ -211,7 +211,12 @@ image = cv2.imread("04-14-2022_12-33-02.jpg")
 #S derecha
 #image = cv2.imread("04-23-2022_14-44-37.jpg")
 #image = cv2.imread("04-23-2022_14-44-57.jpg")
-image = cv2.imread("04-28-2022_23-56-06.jpg")
+image = cv2.imread("04-29-2022_00-17-09.jpg")
+# image = cv2.imread("04-29-2022_00-25-18.jpg")
+# image = cv2.imread("04-29-2022_00-25-01.jpg")
+image = cv2.imread("04-29-2022_00-25-36.jpg")
+image = cv2.imread("04-29-2022_00-26-19.jpg")
+image = cv2.imread("04-29-2022_00-17-09.jpg")
 
 frame = numpy.copy(image)
 
