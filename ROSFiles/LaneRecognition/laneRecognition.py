@@ -7,6 +7,8 @@ from std_msgs.msg import Int32
 import numpy
 import cv2
 import os
+from datetime import datetime
+
 
 def gstreamer_pipeline(
     capture_width=1280,
@@ -92,8 +94,10 @@ def printLines(image, lines, width, height):
             cv2.line(lineImage, (x1, y1), (x2, y2), (255, 255, 255), 10)
     cv2.line(lineImage, (round(width/2), 0), (round(width/2), height), (127, 127, 127), 2)
     lines = cv2.addWeighted(image, 0.8, lineImage, 1,1)
-    plt.imshow(lines)
-    plt.show()
+    #cv2.imshow("CSI Camera", lines)
+    now = datetime.now()
+    date_time = now.strftime("%m-%d-%Y_%H-%M-%S")
+    cv2.imwrite(folder+"/"+date_time+".jpg", lines)
     return lines    
 
 def fillRegion(image, lines, width, height):
@@ -156,7 +160,9 @@ def region_of_interest(imageReceived):
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
         distanceFromReference(lines1, width, referenceYValue)
-    
+    printLines(croppedImage, lines1, width, height)
+
+folder = "Run "+datetime.now().strftime("%m-%d-%Y_%H-%M-%S")    
 publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
 rospy.init_node('vision', anonymous=True)
 
@@ -179,6 +185,9 @@ if camera.isOpened():
         dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
         openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
         region_of_interest(dilateMean)
+
+        
+
 else:
     print("Camera was not opened")
 

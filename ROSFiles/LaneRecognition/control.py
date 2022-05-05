@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import rospy
+import time
 from std_msgs.msg import Int32
 from std_msgs.msg import Float32
 
@@ -23,7 +24,7 @@ def determineSteerValue(message):
 		motor = -1
 	publisherSteering.publish(float(steering))
 	publisherMotor.publish(float(motor))
-	sleep(0.1)
+	time.sleep(0.1)
 	publisherMotor.publish(float(0))
 	
 def listener():
