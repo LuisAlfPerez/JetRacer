@@ -11,11 +11,11 @@ from datetime import datetime
 
 
 def gstreamer_pipeline(
-    capture_width=1280,
-    capture_height=720,
+    capture_width=320, #1280 #640 #320
+    capture_height=240, #720 #480 #240
     display_width=1280,
     display_height=720,
-    framerate=10,
+    framerate=1,
     flip_method=0,
 ):
     return (
@@ -144,25 +144,23 @@ def distanceFromReference(lines, width, referenceValue):
 def region_of_interest(imageReceived):
     height = imageReceived.shape[0]
     width = imageReceived.shape[1]
-    croppedImage = imageReceived[0:height-1, 0:width-130-1]
-    width = croppedImage.shape[1]
 
-    y_begin = 150
-    y_final = 500
-    threshold = 300
-    minLineLength = 35
-    maxLineGap = 50
-    tolerance = 50
-    referenceYValue = 400
+    y_begin = height #150
+    y_final = width #500
+    threshold = int(height*3/2.5) #300
+    minLineLength = int(height*3/20) #35
+    maxLineGap = int(height*3/14) #50
+    tolerance = int(height*3/14) #50
+    referenceYValue = int(height*3/2) #400
 
-    lineImage = numpy.zeros_like(croppedImage)
-    lines1 = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
+    lineImage = numpy.zeros_like(imageReceived)
+    lines1 = lineDetection(imageReceived, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
         distanceFromReference(lines1, width, referenceYValue)
-    printLines(croppedImage, lines1, width, height)
+    printLines(imageReceived, lines1, width, height)
 
-folder = "Run "+datetime.now().strftime("%m-%d-%Y_%H-%M-%S")    
+#folder = "Run "+datetime.now().strftime("%m-%d-%Y_%H-%M-%S")    
 publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
 rospy.init_node('vision', anonymous=True)
 
@@ -173,6 +171,9 @@ if camera.isOpened():
         # Stop the program on the ESC key
         keyCode = cv2.waitKey(30) & 0xFF
         ret, frame = camera.read()
+        height = frame.shape[0]
+        width = frame.shape[1]
+        frame = frame[0:height-1, 0:width-(width/10)-1]
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (9, 9), 0)
         kernelErosion = numpy.ones((2,2),numpy.uint8)
