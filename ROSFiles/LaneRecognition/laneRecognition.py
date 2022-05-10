@@ -173,7 +173,9 @@ if camera.isOpened():
         ret, frame = camera.read()
         height = frame.shape[0]
         width = frame.shape[1]
-        frame = frame[0:height-1, 0:width-(width/10)-1]
+        reduced_height_up = int(height/3)
+        reduced_height_bottom = int(2*height/3)
+        frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-(width/10)-1]
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (9, 9), 0)
         kernelErosion = numpy.ones((2,2),numpy.uint8)
