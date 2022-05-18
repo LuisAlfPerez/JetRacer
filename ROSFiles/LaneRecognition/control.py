@@ -7,25 +7,38 @@ from std_msgs.msg import Float32
 
 publisherMotor = None
 publisherSteering = None
+currentError = None
+latestError = None
 
 def determineSteerValue(message):
 	global publisherMotor
 	global publisherSteering
-	steering = message.data / 25
-	rospy.loginfo("Steering: %d", steering)
+	global currentError
+	global latestError
+	latestError = currentError
+	currentError = message.data
+	time = 0.5
+	k_proportional = 1/100
+	k_derivative = 1/150	
+	derivative = (currentError - latestError)/time
+	steering = k_proportional*currentError + k_derivative * derivative
 	motor = -0.2
 	if steering > 1:
 		steering = 1
 	if steering < -1:
 		steering = -1
-	if motor > 1:
-		motor = 1
-	if motor < -1:
-		motor = -1
+	rospy.loginfo("Steering: %d", steering)
 	publisherSteering.publish(float(steering))
-	publisherMotor.publish(float(motor))
-	time.sleep(0.1)
-	publisherMotor.publish(float(0))
+	extraMotor = 0.075
+	motorSteady = -0.12
+	if abs(steering) > 0.75:
+		publisherMotor.publish(float(motor+extraMotor))
+		time.sleep(0.1)
+		publisherMotor.publish(float(motorSteady))
+	else:
+		publisherMotor.publish(float(motor))
+		time.sleep(0.1)
+		publisherMotor.publish(float(motorSteady))
 	
 def listener():
 	global publisherMotor

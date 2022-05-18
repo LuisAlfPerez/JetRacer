@@ -160,8 +160,7 @@ def distanceFromReference(lines, width, referenceValue):
 def region_of_interest(imageReceived):
     height = imageReceived.shape[0]
     width = imageReceived.shape[1]
-    croppedImage = imageReceived[0:height-1, 0:width-130-1]
-    width = croppedImage.shape[1]
+    croppedImage=imageReceived
     # fieldView = 60*2.5
     # view = numpy.array([
     #     [(0,200),(width/2-fieldView, 0),(width/2+fieldView, 0),(width,200),(width, height),(0, height)]
@@ -170,55 +169,49 @@ def region_of_interest(imageReceived):
     # cv2.fillPoly(mask, numpy.int32([view]), 255)
     # croppedImage = cv2.bitwise_and(croppedImage, mask)
 
-    y_begin = 150
-    y_final = 500
-    threshold = 300
+    y_begin = 0
+    y_final = height
+    threshold = 150
     minLineLength = 35
     maxLineGap = 50
     tolerance = 50
-    referenceYValue = 400
+    referenceYValue = int(height/2)
 
     lineImage = numpy.zeros_like(croppedImage)
     lines1 = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
+    # print(lines1)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
     distanceFromReference(lines1, width, referenceYValue)
     refImage = fillRegion(printLines(croppedImage, lines1, width, height), lines1, width, height)
-    plt.imshow(refImage)
-    #plt.show() 
+    # plt.imshow(refImage)
+    # plt.show() 
 
     
 #publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
 #rospy.init_node('vision', anonymous=True)
-
-#image = cv2.imread("01-24-2022_16-10-45.jpg")
-#image = cv2.imread("recta2.jpg")
-#image = cv2.imread("curva.jpg")
-
 #Recta
-image = cv2.imread("04-14-2022_12-33-02.jpg")
-#Curva izquierda
-#image = cv2.imread("04-23-2022_14-39-19.jpg")
-#Curva derecha
-#image = cv2.imread("04-23-2022_14-40-01.jpg")
-#Recta visión digonal
-#image = cv2.imread("04-23-2022_14-42-23.jpg")
-#Curva izquierda en U
-#image = cv2.imread("04-23-2022_14-43-01.jpg")
-#image = cv2.imread("04-23-2022_14-43-35.jpg")
-#image = cv2.imread("04-23-2022_14-43-54.jpg")
-#image = cv2.imread("04-23-2022_14-44-11.jpg")
-#S derecha
-#image = cv2.imread("04-23-2022_14-44-37.jpg")
-#image = cv2.imread("04-23-2022_14-44-57.jpg")
-image = cv2.imread("04-29-2022_00-17-09.jpg")
-# image = cv2.imread("04-29-2022_00-25-18.jpg")
-# image = cv2.imread("04-29-2022_00-25-01.jpg")
-image = cv2.imread("04-29-2022_00-25-36.jpg")
-image = cv2.imread("04-29-2022_00-26-19.jpg")
-image = cv2.imread("04-29-2022_00-17-09.jpg")
+# image = cv2.imread("05-12-2022_21-45-17.jpg")
+# image = cv2.imread("05-12-2022_21-49-43.jpg")
+# image = cv2.imread("05-12-2022_21-50-13.jpg")
 
-frame = numpy.copy(image)
+#Curva izquierda
+# image = cv2.imread("05-12-2022_21-47-07.jpg")
+# image = cv2.imread("05-12-2022_21-48-15.jpg")
+# image = cv2.imread("05-12-2022_21-51-17.jpg")
+
+#Curva derecha
+# image = cv2.imread("05-12-2022_21-46-13.jpg")
+image = cv2.imread("05-12-2022_21-49-17.jpg")
+
+
+
+height = image.shape[0]
+width = image.shape[1]
+reduced_height_up = int(height/3)
+reduced_height_bottom = int(2*height/3)
+
+image = image[reduced_height_up:reduced_height_bottom-1, 0:width-130-1]
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (9, 9), 0)
@@ -255,14 +248,14 @@ if camera.isOpened():
 else:
     print("Camera was not opened")
     """
-titles = ['Original Image', 'Gray',
-        'GaussianBlur','Adaptive Mean Thresholding','Erosion Mean','Dilate Mean','Opening Mean']
-images = [frame, gray, blurred, threshMean, erosionMean, dilateMean, openingMean]
-plt.figure('JetRacer Camera')
-for i in range(6):
-    plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
-    plt.title(titles[i])
-    plt.xticks([]),plt.yticks([])
+# titles = ['Original Image', 'Gray',
+#         'GaussianBlur','Adaptive Mean Thresholding','Erosion Mean','Dilate Mean','Opening Mean']
+# images = [frame, gray, blurred, threshMean, erosionMean, dilateMean, openingMean]
+# plt.figure('JetRacer Camera')
+# for i in range(6):
+#     plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
+#     plt.title(titles[i])
+#     plt.xticks([]),plt.yticks([])
 #plt.show()
 
 """

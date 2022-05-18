@@ -123,41 +123,73 @@ def fillRegion(image, lines, width, height):
             cv2.line(mask, (x1, y), (x2, y), (255, 255, 255), 1)
     return mask
 
-def distanceFromReference(lines, width, referenceValue):
+def distanceFromReference(lines, width, referenceValueCloser, referenceValueMiddle, refenceValueFurther):
     refx=round(width/2)
-    x1=0
-    x2=width
-    y=referenceValue
+    x_left_closer=0
+    x_right_closer=width
+    y_closer=referenceValueCloser
+
+    x_left_middle=0
+    x_right_middle=width
+    y_middle=referenceValueMiddle
+
+    x_left_further=0
+    x_right_further=width
+    y_further=referenceValueFurther
+
     for line in lines:
-        if line.y_min <= y and line.y_max >= y:
-            x = line.calculateXValue(y)
+        if line.y_min <= y_close and line.y_max >= y_closer:
+            x = line.calculateXValue(y_closer)
             if x < refx:
-                if x > x1:
-                    x1 = x
+                if x > x_left_closer:
+                    x_left_closer = x
             else:
-                if x < x2:
-                    x2 = x
-    rospy.loginfo("Distance from reference: %d", int((x2+x1)/2-round(width/2)))
-    publisher.publish(int((x2+x1)/2-round(width/2)))
+                if x < x_right_closer:
+                    x_right_closer = x
+
+            x = line.calculateXValue(y_middle)
+            if x < refx:
+                if x > x_left_middle:
+                    x_left_middle = x
+            else:
+                if x < x_right_middle:
+                    x_right_middle = x
+
+            x = line.calculateXValue(y_further)
+            if x < refx:
+                if x > x_left_further:
+                    x_left_further = x
+            else:
+                if x < x_right_further:
+                    x_right_further = x
+    k_closer = 1/2
+    k_middle = 2 
+    k_further = 1 
+    x_left = (k_closer*x_left_closer + k_middle*x_left_middle + k_further*x_left_further)/(k_closer+k_middle+k_further)
+    x_right = (k_closer*x_right_closer + k_middle*x_right_middle + k_further*x_right_further)/(k_closer+k_middle+k_further)                
+    rospy.loginfo("Distance from reference: %d", int((x_right+x_left)/2-round(width/2)))
+    publisher.publish(int((x_right+x_left)/2-round(width/2)))
     return 
 
 def region_of_interest(imageReceived):
     height = imageReceived.shape[0]
     width = imageReceived.shape[1]
 
-    y_begin = height #150
-    y_final = width #500
-    threshold = int(height*3/2.5) #300
-    minLineLength = int(height*3/20) #35
-    maxLineGap = int(height*3/14) #50
-    tolerance = int(height*3/14) #50
-    referenceYValue = int(height*3/2) #400
+    y_begin = 0 #150
+    y_final = height #500
+    threshold = 150 #300
+    minLineLength = 35 #35
+    maxLineGap = 50 #50
+    tolerance = 50 #50
+    referenceYValueCloser = int(height*3/4) #400
+    referenceYValueMiddle = int(height/2) #400
+    referenceYValueFurther = int(height/4) #400
 
     lineImage = numpy.zeros_like(imageReceived)
     lines1 = lineDetection(imageReceived, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
-        distanceFromReference(lines1, width, referenceYValue)
+        distanceFromReference(lines1, width, referenceYValueCloser, referenceYValueMiddle, referenceYValueFurther)
     printLines(imageReceived, lines1, width, height)
 
 #folder = "Run "+datetime.now().strftime("%m-%d-%Y_%H-%M-%S")    
