@@ -213,7 +213,7 @@ if camera.isOpened():
 
         final_time = datetime.now()
         processingtime = (final_time-begin_time)
-        print("Processing time: %d", processingtime)
+        print("Processing time: ", processingtime)
 
         # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # blurred = cv2.GaussianBlur(gray, (9, 9), 0)
