@@ -265,6 +265,17 @@ def on_press(key):
     except:
         stop = False
 
+def on_release(key):
+    global stop
+
+    try:
+        if key == keyboard.Key.esc:
+            exit()
+            print("Esc presionado")
+            stop = True
+    except:
+        stop = False
+
 with keyboard.Listener(
         on_press=on_press,
         on_release=on_press) as listener:
