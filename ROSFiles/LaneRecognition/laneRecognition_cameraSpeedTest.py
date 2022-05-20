@@ -135,31 +135,32 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
     x_right_further=width
     y_further=referenceValueFurther
 
-    for line in lines:
-        if line.y_min <= y_closer and line.y_max >= y_further:
-            x = line.calculateXValue(y_closer)
-            if x < refx:
-                if x > x_left_closer:
-                    x_left_closer = x
-            else:
-                if x < x_right_closer:
-                    x_right_closer = x
+    if lines:
+        for line in lines:
+            if line.y_min <= y_closer and line.y_max >= y_further:
+                x = line.calculateXValue(y_closer)
+                if x < refx:
+                    if x > x_left_closer:
+                        x_left_closer = x
+                else:
+                    if x < x_right_closer:
+                        x_right_closer = x
 
-            x = line.calculateXValue(y_middle)
-            if x < refx:
-                if x > x_left_middle:
-                    x_left_middle = x
-            else:
-                if x < x_right_middle:
-                    x_right_middle = x
+                x = line.calculateXValue(y_middle)
+                if x < refx:
+                    if x > x_left_middle:
+                        x_left_middle = x
+                else:
+                    if x < x_right_middle:
+                        x_right_middle = x
 
-            x = line.calculateXValue(y_further)
-            if x < refx:
-                if x > x_left_further:
-                    x_left_further = x
-            else:
-                if x < x_right_further:
-                    x_right_further = x
+                x = line.calculateXValue(y_further)
+                if x < refx:
+                    if x > x_left_further:
+                        x_left_further = x
+                else:
+                    if x < x_right_further:
+                        x_right_further = x
 
     k_closer = 1/2
     k_middle = 2 
@@ -190,7 +191,7 @@ def region_of_interest(imageReceived):
     lines1 = lineDetection(imageReceived, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
-        distanceFromReference(lines1, width, referenceYValueCloser, referenceYValueMiddle, referenceYValueFurther)
+    distanceFromReference(lines1, width, referenceYValueCloser, referenceYValueMiddle, referenceYValueFurther)
     printLines(imageReceived, lines1, width, height)
 
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
