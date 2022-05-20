@@ -259,6 +259,7 @@ def on_press(key):
 
     try:
         if key == keyboard.Key.esc:
+            print("Esc presionado")
             stop = True
     except:
         stop = False
