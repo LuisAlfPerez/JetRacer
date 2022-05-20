@@ -169,6 +169,7 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
     x_right = (k_closer*x_right_closer + k_middle*x_right_middle + k_further*x_right_further)/(k_closer+k_middle+k_further)                
     
     distance_from_reference = int((x_right+x_left)/2-round(width/2))
+    print("Distance from reference: ", distance_from_reference)
     return 
 
 def region_of_interest(imageReceived):
