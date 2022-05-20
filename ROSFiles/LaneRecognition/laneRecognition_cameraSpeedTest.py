@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 from setupFiles.lineFunction import LineFunction
 from std_msgs.msg import Int32
 from datetime import datetime
+from pynput import keyboard
 
 
 def gstreamer_pipeline(
