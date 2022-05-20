@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
-from matplotlib import pyplot as plt
-from setupFiles.lineFunction import LineFunction
-import rospy
-from std_msgs.msg import Int32
+import threading
 import numpy
 import cv2
 import os
+import rospy
+
+from matplotlib import pyplot as plt
+from setupFiles.lineFunction import LineFunction
+from std_msgs.msg import Int32
 from datetime import datetime
 
 
@@ -195,52 +197,57 @@ def region_of_interest(imageReceived):
     printLines(imageReceived, lines1, width, height)
 
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
-current_photo = datetime.now()
-last_photo = 0
-if camera.isOpened():
-    keyCode = 0
-    while keyCode != 27:
-        last_photo = current_photo
-        current_photo = datetime.now()
 
-        time_between_captures = current_photo - last_photo
+def runCamera():
+    current_photo = datetime.now()
+    last_photo = 0
+    if camera.isOpened():
+        keyCode = 0
+        while keyCode != 27:
+            last_photo = current_photo
+            current_photo = datetime.now()
 
-        print("Time between captures: ", time_between_captures)
+            time_between_captures = current_photo - last_photo
 
-        # Stop the program on the ESC key
-        keyCode = cv2.waitKey(30) & 0xFF
-        
-        begin_time = datetime.now()
+            print("Time between captures: ", time_between_captures)
 
-        ret, frame = camera.read()
-        height = frame.shape[0]
-        width = frame.shape[1]
-        reduced_height_up = int(height/3)
-        reduced_height_bottom = int(2*height/3)
-        frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
+            # Stop the program on the ESC key
+            keyCode = cv2.waitKey(30) & 0xFF
+            
+            begin_time = datetime.now()
 
-        final_time = datetime.now()
-        processingtime = (final_time-begin_time)
-        print("Camera capture time: ", processingtime)
+            ret, frame = camera.read()
+            height = frame.shape[0]
+            width = frame.shape[1]
+            reduced_height_up = int(height/3)
+            reduced_height_bottom = int(2*height/3)
+            frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
 
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (9, 9), 0)
-        kernelErosion = numpy.ones((2,2),numpy.uint8)
-        kernelDilate = numpy.ones((15,15),numpy.uint8)
-        kernelOpening = numpy.ones((3,3),numpy.uint8)
-        
-        #MEAN
-        threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
-        erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
-        dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
-        openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
-        region_of_interest(dilateMean)
+            final_time = datetime.now()
+            processingtime = (final_time-begin_time)
+            print("Camera capture time: ", processingtime)
 
-        final_time = datetime.now()
-        processingtime = (final_time-begin_time)
-        print("Total processing time: ", processingtime)
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.GaussianBlur(gray, (9, 9), 0)
+            kernelErosion = numpy.ones((2,2),numpy.uint8)
+            kernelDilate = numpy.ones((15,15),numpy.uint8)
+            kernelOpening = numpy.ones((3,3),numpy.uint8)
+            
+            #MEAN
+            threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
+            erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
+            dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
+            openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
+            region_of_interest(dilateMean)
 
-else:
-    print("Camera was not opened")
+            final_time = datetime.now()
+            processingtime = (final_time-begin_time)
+            print("Total processing time: ", processingtime)
 
-cv2.destroyAllWindows()
+    else:
+        print("Camera was not opened")
+
+    cv2.destroyAllWindows()
+
+thread_camera = threading.Thread(target=runCamera)
+thread_camera.start()
