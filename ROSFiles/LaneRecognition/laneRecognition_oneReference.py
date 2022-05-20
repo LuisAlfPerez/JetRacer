@@ -15,7 +15,7 @@ def gstreamer_pipeline(
     capture_height=240, #720 #480 #240
     display_width=320,
     display_height=240,
-    framerate=2,
+    framerate=10,
     flip_method=0,
 ):
     return (
@@ -168,38 +168,59 @@ publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
 rospy.init_node('vision', anonymous=True)
 
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
-if camera.isOpened():
-    keyCode = 0
-    while keyCode != 27:
-        # Stop the program on the ESC key
-        keyCode = cv2.waitKey(30) & 0xFF
-        ret, frame = camera.read()
 
-        begin_time = datetime.now()
+stop = False
+def runCamera():
+    global stop
+    if camera.isOpened():
+        keyCode = 0
+        while stop == False:
+            # Stop the program on the ESC key
+            keyCode = cv2.waitKey(30) & 0xFF
+            ret, frame = camera.read()
 
-        height = frame.shape[0]
-        width = frame.shape[1]
-        reduced_height_up = int(height/3)
-        reduced_height_bottom = int(2*height/3)
-        frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
-        
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (9, 9), 0)
-        kernelErosion = numpy.ones((2,2),numpy.uint8)
-        kernelDilate = numpy.ones((15,15),numpy.uint8)
-        kernelOpening = numpy.ones((3,3),numpy.uint8)
-        threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
-        erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
-        dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
-        openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
+            begin_time = datetime.now()
 
-        region_of_interest(dilateMean)
+            height = frame.shape[0]
+            width = frame.shape[1]
+            reduced_height_up = int(height/3)
+            reduced_height_bottom = int(2*height/3)
+            frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
+            
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.GaussianBlur(gray, (9, 9), 0)
+            kernelErosion = numpy.ones((2,2),numpy.uint8)
+            kernelDilate = numpy.ones((15,15),numpy.uint8)
+            kernelOpening = numpy.ones((3,3),numpy.uint8)
+            threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
+            erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
+            dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
+            openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
 
-        final_time = datetime.now()
-        processingtime = (final_time-begin_time)
-        rospy.loginfo("Total processing time: ", processingtime)
+            region_of_interest(dilateMean)
 
-else:
-    print("Camera was not opened")
+            final_time = datetime.now()
+            processingtime = (final_time-begin_time)
+            rospy.loginfo("Total processing time: ", processingtime)
 
-cv2.destroyAllWindows()
+    else:
+        print("Camera was not opened")
+
+    cv2.destroyAllWindows()
+
+thread_camera = threading.Thread(target=runCamera)
+thread_camera.start()
+
+def on_press(key):
+    global stop
+
+    try:
+        if key == keyboard.Key.esc:
+            stop = True
+    except:
+        stop = False
+
+with keyboard.Listener(
+        on_press=on_press,
+        on_release=on_press) as listener:
+    listener.join()
