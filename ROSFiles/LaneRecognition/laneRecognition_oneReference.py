@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-from matplotlib import pyplot as plt
-from setupFiles.lineFunction import LineFunction
+import threading
 import rospy
-from std_msgs.msg import Int32
 import numpy
 import cv2
 import os
+from matplotlib import pyplot as plt
+from setupFiles.lineFunction import LineFunction
+from std_msgs.msg import Int32
 from datetime import datetime
 
 
