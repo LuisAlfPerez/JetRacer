@@ -121,23 +121,24 @@ def fillRegion(image, lines, width, height):
             cv2.line(mask, (x1, y), (x2, y), (255, 255, 255), 1)
     return mask
 
-def distanceFromReference(lines, width, referenceValueCloser, referenceValueMiddle, referenceValueFurther):
+def distanceFromReference(lines, width, referenceValueMiddle):
     refx=round(width/2)
 
     x_left_middle=0
     x_right_middle=width
     y_middle=referenceValueMiddle
 
-    for line in lines:
-        if line.y_min <= y_middle and line.y_max >= y_middle:
-            x = line.calculateXValue(y_middle)
-            if x < refx:
-                if x > x_left_middle:
-                    x_left_middle = x
-            else:
-                if x < x_right_middle:
-                    x_right_middle = x
- 
+    if lines:
+        for line in lines:
+            if line.y_min <= y_middle and line.y_max >= y_middle:
+                x = line.calculateXValue(y_middle)
+                if x < refx:
+                    if x > x_left_middle:
+                        x_left_middle = x
+                else:
+                    if x < x_right_middle:
+                        x_right_middle = x
+     
     x_left = x_left_middle
     x_right = x_right_middle
 
@@ -162,7 +163,7 @@ def region_of_interest(imageReceived):
     lines1 = lineDetection(imageReceived, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
-        distanceFromReference(lines1, width, referenceYValueMiddle)
+    distanceFromReference(lines1, width, referenceYValueMiddle)
     printLines(imageReceived, lines1, width, height)
 
 publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
