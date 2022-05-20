@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from setupFiles.lineFunction import LineFunction
 from std_msgs.msg import Int32
 from datetime import datetime
-
+from pynput import keyboard
 
 def gstreamer_pipeline(
     capture_width=320, #1280 #640 #320
@@ -201,7 +201,7 @@ def runCamera():
             region_of_interest(dilateMean)
 
             final_time = datetime.now()
-            processingtime = (final_time-begin_time)
+            processingtime = str(final_time-begin_time)
             rospy.loginfo("Total processing time: ", processingtime)
 
     else:
