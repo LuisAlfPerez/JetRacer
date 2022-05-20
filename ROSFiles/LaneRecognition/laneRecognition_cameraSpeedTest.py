@@ -193,9 +193,18 @@ def region_of_interest(imageReceived):
     printLines(imageReceived, lines1, width, height)
 
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
+current_photo = datetime.now()
+last_photo = 0
 if camera.isOpened():
     keyCode = 0
     while keyCode != 27:
+        last_photo = current_photo
+        current_photo = datetime.now()
+
+        time_between_captures = current_photo - last_photo
+
+        print("Time between captures: ", time_between_captures)
+
         # Stop the program on the ESC key
         keyCode = cv2.waitKey(30) & 0xFF
         
