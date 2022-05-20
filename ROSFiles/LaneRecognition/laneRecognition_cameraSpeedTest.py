@@ -260,6 +260,8 @@ def on_press(key):
     try:
         if key == keyboard.Key.esc:
             stop = True
+    except:
+        stop = False
 
 with keyboard.Listener(
         on_press=on_press,
