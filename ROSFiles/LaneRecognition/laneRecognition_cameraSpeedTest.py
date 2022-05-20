@@ -211,7 +211,8 @@ if camera.isOpened():
         reduced_height_bottom = int(2*height/3)
         frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
 
-        processingtime = float(datetime.now()-begin_time)
+        final_time = datetime.now()
+        processingtime = (final_time-begin_time)
         print("Processing time: %d", processingtime)
 
         # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
