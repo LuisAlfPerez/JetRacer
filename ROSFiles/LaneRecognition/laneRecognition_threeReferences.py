@@ -226,8 +226,9 @@ if camera.isOpened():
         
         region_of_interest(dilateMean)
 
-        rospy.loginfo("Processing time: %d", int(datetime.now()-begin_time))
-
+        final_time = datetime.now()
+        processingtime = (final_time-begin_time)
+        rospy.loginfo("Total processing time: ", processingtime)
 
 else:
     print("Camera was not opened")
