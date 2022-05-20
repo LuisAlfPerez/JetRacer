@@ -270,7 +270,7 @@ def on_release(key):
 
     try:
         if key == keyboard.Key.esc:
-            exit()
+            sys.exit()
             print("Esc presionado")
             stop = True
     except:
