@@ -202,7 +202,7 @@ def runCamera():
 
             final_time = datetime.now()
             processingtime = str(final_time-begin_time)
-            rospy.loginfo("Total processing time: ", processingtime)
+            rospy.loginfo("Total processing time: "+ processingtime)
 
     else:
         print("Camera was not opened")
