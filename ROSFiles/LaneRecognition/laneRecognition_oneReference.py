@@ -122,29 +122,13 @@ def fillRegion(image, lines, width, height):
 
 def distanceFromReference(lines, width, referenceValueCloser, referenceValueMiddle, referenceValueFurther):
     refx=round(width/2)
-    
-    x_left_closer=0
-    x_right_closer=width
-    y_closer=referenceValueCloser
 
     x_left_middle=0
     x_right_middle=width
     y_middle=referenceValueMiddle
 
-    x_left_further=0
-    x_right_further=width
-    y_further=referenceValueFurther
-
     for line in lines:
-        if line.y_min <= y_closer and line.y_max >= y_further:
-            x = line.calculateXValue(y_closer)
-            if x < refx:
-                if x > x_left_closer:
-                    x_left_closer = x
-            else:
-                if x < x_right_closer:
-                    x_right_closer = x
-
+        if line.y_min <= y_middle and line.y_max >= y_middle:
             x = line.calculateXValue(y_middle)
             if x < refx:
                 if x > x_left_middle:
@@ -152,22 +136,10 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
             else:
                 if x < x_right_middle:
                     x_right_middle = x
+ 
+    x_left = x_left_middle
+    x_right = x_right_middle
 
-            x = line.calculateXValue(y_further)
-            if x < refx:
-                if x > x_left_further:
-                    x_left_further = x
-            else:
-                if x < x_right_further:
-                    x_right_further = x
-
-    k_closer = 1/2
-    k_middle = 2 
-    k_further = 1 
-
-    x_left = (k_closer*x_left_closer + k_middle*x_left_middle + k_further*x_left_further)/(k_closer+k_middle+k_further)
-    x_right = (k_closer*x_right_closer + k_middle*x_right_middle + k_further*x_right_further)/(k_closer+k_middle+k_further)                
-    
     distance_from_reference = int((x_right+x_left)/2-round(width/2))
 
     rospy.loginfo("Distance from reference: %d", distance_from_reference)
@@ -184,15 +156,12 @@ def region_of_interest(imageReceived):
     minLineLength = 35 #35
     maxLineGap = 50 #50
     tolerance = 50 #50
-    referenceYValueCloser = int(height*3/4) #400
     referenceYValueMiddle = int(height/2) #400
-    referenceYValueFurther = int(height/4) #400
-
     lineImage = numpy.zeros_like(imageReceived)
     lines1 = lineDetection(imageReceived, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
-        distanceFromReference(lines1, width, referenceYValueCloser, referenceYValueMiddle, referenceYValueFurther)
+        distanceFromReference(lines1, width, referenceYValueMiddle)
     printLines(imageReceived, lines1, width, height)
 
 publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
@@ -205,23 +174,25 @@ if camera.isOpened():
         # Stop the program on the ESC key
         keyCode = cv2.waitKey(30) & 0xFF
         ret, frame = camera.read()
+
         begin_time = datetime.now()
+
         height = frame.shape[0]
         width = frame.shape[1]
         reduced_height_up = int(height/3)
         reduced_height_bottom = int(2*height/3)
         frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
+        
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (9, 9), 0)
         kernelErosion = numpy.ones((2,2),numpy.uint8)
         kernelDilate = numpy.ones((15,15),numpy.uint8)
         kernelOpening = numpy.ones((3,3),numpy.uint8)
-        
-        #MEAN
         threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
         erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
         dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
         openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
+
         region_of_interest(dilateMean)
 
         rospy.loginfo("Processing time: %d", int(datetime.now()-begin_time))
