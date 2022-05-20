@@ -199,11 +199,12 @@ def region_of_interest(imageReceived):
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 
 def runCamera():
+    global stop
     current_photo = datetime.now()
     last_photo = 0
     if camera.isOpened():
         keyCode = 0
-        while keyCode != 27:
+        while stop == False:
             last_photo = current_photo
             current_photo = datetime.now()
 
@@ -249,5 +250,18 @@ def runCamera():
 
     cv2.destroyAllWindows()
 
+stop = False
 thread_camera = threading.Thread(target=runCamera)
 thread_camera.start()
+
+def on_press(key):
+    global stop
+
+    try:
+        if key == keyboard.Key.esc:
+            stop = True
+
+with keyboard.Listener(
+        on_press=on_press,
+        on_release=on_press) as listener:
+    listener.join()
