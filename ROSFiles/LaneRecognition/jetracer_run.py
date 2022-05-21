@@ -6,6 +6,7 @@ import cv2
 import os
 import time
 
+from setup.nvidia_racecar import NvidiaRacecar
 from matplotlib import pyplot as plt
 from setupFiles.lineFunction import LineFunction
 from datetime import datetime
