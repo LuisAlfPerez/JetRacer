@@ -28,6 +28,9 @@ def motors_movement(throttle, steering):
     currentError = 0
     return 
 
+
+latestError = 0
+currentError = 0
 def control(error):
     global latestError
     global currentError
