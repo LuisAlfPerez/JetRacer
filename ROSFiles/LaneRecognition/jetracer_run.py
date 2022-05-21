@@ -21,6 +21,14 @@ car.throttle_gain = 1
 
 def motors_movement(throttle, steering):
     global car
+    if steering > 1:
+        steering = 1
+    elif steering < -1:
+        steering = -1
+    if throttle > 1:
+        throttle = 1
+    elif throttle < -1:
+        throttle = -1
     car.steering = steering
     car.throttle = throttle
 
