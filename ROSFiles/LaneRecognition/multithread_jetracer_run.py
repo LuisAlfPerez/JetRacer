@@ -276,7 +276,7 @@ def runMotors():
     current_analysis = datetime.now()
     last_analysis = datetime.now()
     while stop == False:
-        if frame is not None and inUse = False:
+        if frame is not None and inUse == False:
             height = frame.shape[0]
             width = frame.shape[1]
             reduced_height_up = int(4*height/9)
