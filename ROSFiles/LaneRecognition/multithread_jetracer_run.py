@@ -32,13 +32,12 @@ def motors_movement(throttle, steering):
     car.steering = steering
     car.throttle = throttle
 
-    latestError = 0
-    currentError = 0
     return 
 
 
 latestError = 0
 currentError = 0
+
 def control(error):
     global latestError
     global currentError
@@ -293,7 +292,7 @@ def runMotors():
             last_analysis = current_analysis
             current_analysis = datetime.now()
             time_analysis = current_analysis - last_analysis
-            print("Total capture time: ", time_analysis)
+            print("Total analysis time: ", time_analysis)
 
         time.sleep(0.1)
             
