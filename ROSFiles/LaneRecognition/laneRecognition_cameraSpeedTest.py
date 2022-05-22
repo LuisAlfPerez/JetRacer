@@ -97,7 +97,7 @@ def printLines(image, lines, width, height):
             cv2.line(lineImage, (x1, y1), (x2, y2), (255, 255, 255), 10)
     cv2.line(lineImage, (round(width/2), 0), (round(width/2), height), (127, 127, 127), 2)
     lines = cv2.addWeighted(image, 0.8, lineImage, 1,1)
-    #cv2.imshow("CSI Camera", lines)
+    cv2.imshow("CSI Camera", lines)
     return lines    
 
 def fillRegion(image, lines, width, height):
