@@ -274,8 +274,8 @@ def runMotors():
         if frame is not None:
             height = frame.shape[0]
             width = frame.shape[1]
-            reduced_height_up = int(height/2)
-            reduced_height_bottom = int(5*height/6)
+            reduced_height_up = int(4*height/9)
+            reduced_height_bottom = int(7*height/9)
             frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
