@@ -209,7 +209,7 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
                     if x < x_right_further:
                         x_right_further = x
 
-    k_closer = 3
+    k_closer = 1
     k_middle = 3 
     k_further = 1 
 
