@@ -31,7 +31,7 @@ def motors_movement(throttle, steering):
         throttle = -1
     car.steering = steering
     car.throttle = throttle
-    
+
     return 
 
 
@@ -288,19 +288,7 @@ def runCamera():
         print("Camera was not opened")
 
     cv2.destroyAllWindows()
-
-def runMotors():
-    global frame
-    global stop
-    current_analysis = datetime.now()
-    last_analysis = datetime.now()
-    while stop == False:
-        if frame is not None:
-            
-
-        time.sleep(0.1)
-            
-
+    
 stop = False
 
 def on_press(key):
