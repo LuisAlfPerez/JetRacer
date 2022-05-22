@@ -29,8 +29,8 @@ def motors_movement(throttle, steering):
         throttle = 1
     elif throttle < -1:
         throttle = -1
-    car.steering = steering
-    car.throttle = throttle
+    car.steering = 0
+    car.throttle = 0
 
     return 
 
