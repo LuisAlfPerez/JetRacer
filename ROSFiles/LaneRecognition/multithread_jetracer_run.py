@@ -60,8 +60,8 @@ def control(error):
 def gstreamer_pipeline(
     capture_width=320, #1280 #640 #320
     capture_height=240, #720 #480 #240
-    display_width=320,
-    display_height=240,
+    display_width=1280,
+    display_height=720,
     framerate=10,
     flip_method=0,
 ):
@@ -209,8 +209,8 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
                     if x < x_right_further:
                         x_right_further = x
 
-    k_closer = 1
-    k_middle = 0 
+    k_closer = 0
+    k_middle = 1 
     k_further = 0 
 
     x_left = (k_closer*x_left_closer + k_middle*x_left_middle + k_further*x_left_further)/(k_closer+k_middle+k_further)
@@ -274,8 +274,8 @@ def runMotors():
         if frame is not None:
             height = frame.shape[0]
             width = frame.shape[1]
-            reduced_height_up = int(height/3)
-            reduced_height_bottom = int(2*height/3)
+            reduced_height_up = int(height/2)
+            reduced_height_bottom = int(5*height/6)
             frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
