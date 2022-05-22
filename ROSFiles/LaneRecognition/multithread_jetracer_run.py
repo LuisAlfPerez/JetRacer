@@ -15,7 +15,7 @@ from pynput import keyboard
 car = NvidiaRacecar()
 car.steering = 0
 car.steering_gain = 0.6
-car.steering_offset = 0
+car.steering_offset = 0.1
 car.throttle = 0
 car.throttle_gain = 1
 
@@ -52,7 +52,7 @@ def control(error):
     derivative = (currentError - latestError)/time_between_images
     
     steering = k_proportional*currentError + k_derivative * derivative
-    motor = -0.12
+    motor = -0.15
 
     motors_movement(motor, steering)
     return
@@ -209,8 +209,8 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
                     if x < x_right_further:
                         x_right_further = x
 
-    k_closer = 0
-    k_middle = 1 
+    k_closer = 1
+    k_middle = 0 
     k_further = 0 
 
     x_left = (k_closer*x_left_closer + k_middle*x_left_middle + k_further*x_left_further)/(k_closer+k_middle+k_further)
