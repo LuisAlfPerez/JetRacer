@@ -52,7 +52,7 @@ def control(error):
     derivative = (currentError - latestError)/time_between_images
     
     steering = k_proportional*currentError + k_derivative * derivative
-    motor = -0.12
+    motor = -0.15
 
     motors_movement(motor, steering)
     return
