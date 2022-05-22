@@ -34,22 +34,24 @@ def motors_movement(throttle, steering):
 
     return 
 
-
-latestError = 0
+thirdError = 0
+secondError = 0
 currentError = 0
 
 def control(error):
-    global latestError
+    global thirdError
+    global secondError
     global currentError
 
-    latestError = currentError
+    thirdError = secondError
+    secondError = currentError
     currentError = error
     time_between_images = 0.1
     
     k_proportional = 1/75
     k_derivative = 1/5000    
     
-    derivative = (currentError - latestError)/time_between_images
+    derivative = (currentError - thirdError)/time_between_images
     
     steering = k_proportional*currentError + k_derivative * derivative
     motor = -0.16
