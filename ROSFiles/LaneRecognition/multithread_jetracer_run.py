@@ -46,12 +46,11 @@ def control(error):
     thirdError = secondError
     secondError = currentError
     currentError = error
-    time_between_images = 0.1
     
     k_proportional = 1/75
-    k_derivative = 1/7500    
+    k_derivative = 1/750    
     
-    derivative = (currentError - thirdError)/time_between_images
+    derivative = (currentError - thirdError)
     
     steering = k_proportional*currentError + k_derivative * derivative
     motor = -0.16
