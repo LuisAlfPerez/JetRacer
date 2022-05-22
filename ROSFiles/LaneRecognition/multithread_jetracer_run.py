@@ -246,15 +246,19 @@ def region_of_interest(imageReceived):
 
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 frame = None
+inUse = False
 def runCamera():
     global stop
     global frame
+    global inUse
     current_photo = datetime.now()
     last_photo = datetime.now()
     if camera.isOpened():
         keyCode = 0
         while stop == False:
+            inUse = True
             ret, frame = camera.read()
+            inUse = False
             last_photo = current_photo
             current_photo = datetime.now()
             time_between_captures = current_photo - last_photo
@@ -268,10 +272,11 @@ def runCamera():
 def runMotors():
     global frame
     global stop
+    global inUse
     current_analysis = datetime.now()
     last_analysis = datetime.now()
     while stop == False:
-        if frame is not None:
+        if frame is not None and inUse = False:
             height = frame.shape[0]
             width = frame.shape[1]
             reduced_height_up = int(4*height/9)
