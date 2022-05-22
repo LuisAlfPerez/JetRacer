@@ -49,7 +49,7 @@ def control(error):
     time_between_images = 0.1
     
     k_proportional = 1/75
-    k_derivative = 1/3500    
+    k_derivative = 1/7500    
     
     derivative = (currentError - thirdError)/time_between_images
     
