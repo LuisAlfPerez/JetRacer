@@ -18,7 +18,7 @@ def gstreamer_pipeline(
     capture_height=240, #720 #480 #240
     display_width=1280,
     display_height=720,
-    framerate=10,
+    framerate=2,
     flip_method=0,
 ):
     return (
@@ -165,9 +165,9 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
                     if x < x_right_further:
                         x_right_further = x
 
-    k_closer = 1/2
-    k_middle = 2 
-    k_further = 1 
+    k_closer = 0
+    k_middle = 1
+    k_further = 0
 
     x_left = (k_closer*x_left_closer + k_middle*x_left_middle + k_further*x_left_further)/(k_closer+k_middle+k_further)
     x_right = (k_closer*x_right_closer + k_middle*x_right_middle + k_further*x_right_further)/(k_closer+k_middle+k_further)                
