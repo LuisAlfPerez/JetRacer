@@ -16,8 +16,8 @@ from pynput import keyboard
 def gstreamer_pipeline(
     capture_width=320, #1280 #640 #320
     capture_height=240, #720 #480 #240
-    display_width=320,
-    display_height=240,
+    display_width=1280,
+    display_height=720,
     framerate=10,
     flip_method=0,
 ):
