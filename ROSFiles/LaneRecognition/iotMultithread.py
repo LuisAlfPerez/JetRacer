@@ -43,9 +43,10 @@ def connect_mqtt():
 def sendIoT():
     global car
     global currentError
-    client.publish(topic1, car.steering)
-    client.publish(topic2, car.throttle)
-    client.publish(topic3, currentError)
+    if client is not None:
+        client.publish(topic1, car.steering)
+        client.publish(topic2, car.throttle)
+        client.publish(topic3, currentError)
     return
 
 def motors_movement(throttle, steering):
