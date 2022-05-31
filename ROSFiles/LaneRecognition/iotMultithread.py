@@ -337,9 +337,10 @@ def runIot():
     client.loop_start()       
 
 stop = False
+runIot()
 thread_camera = threading.Thread(target=runCamera)
 thread_motors = threading.Thread(target=runMotors)
-thread_iot = threading.Thread(target=runIot)
+thread_iot = threading.Thread(target=sendIoT)
 thread_camera.start()
 thread_motors.start()
 thread_iot.start()
