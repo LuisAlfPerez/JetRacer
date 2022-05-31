@@ -26,7 +26,7 @@ topic2 = "/Throttle"
 topic3 = "/Error"
 ClientID = "Test"
 
-client
+client = None
 
 def connect_mqtt():
     def on_connect(client, userdata, flags, rc):
