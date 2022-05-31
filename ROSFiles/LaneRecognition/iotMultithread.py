@@ -40,6 +40,14 @@ def connect_mqtt():
     client.connect("localhost", port, 60)
     return client
 
+def sendIoT():
+    global car
+    global currentError
+    client.publish(topic1, car.steering)
+    client.publish(topic2, car.throttle)
+    client.publish(topic3, currentError)
+    return
+
 def motors_movement(throttle, steering):
     global car
     if steering > 1:
@@ -52,9 +60,6 @@ def motors_movement(throttle, steering):
         throttle = -1
     car.steering = steering
     car.throttle = throttle
-    client.publish(topic1, steering)
-    client.publish(topic2, throttle)
-
     return 
 
 thirdError = 0
@@ -77,7 +82,6 @@ def control(error):
     
     steering = k_proportional*currentError + k_derivative * derivative
     motor = -0.16
-    client.publish(topic3, currentError)
     motors_movement(motor, steering)
     return
 
