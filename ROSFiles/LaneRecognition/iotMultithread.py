@@ -26,7 +26,6 @@ topic2 = "/Throttle"
 topic3 = "/Error"
 ClientID = "Test"
 
-client = None
 
 def connect_mqtt():
     def on_connect(client, userdata, flags, rc):
@@ -35,19 +34,17 @@ def connect_mqtt():
         else:
             print("Failed to connect, return code %d\n", rc)
 
-    client = mqtt_client.Client(ClientID)
+    client = mqtt_client.Client()
     client.on_connect = on_connect
     client.connect("localhost", port, 60)
     return client
 
-def sendIoT():
-    global car
-    global currentError
-    if client is not None:
+def publishData(client):
+    while True:
         client.publish(topic1, car.steering)
         client.publish(topic2, car.throttle)
         client.publish(topic3, currentError)
-    return
+        time.sleep(1)
 
 def motors_movement(throttle, steering):
     global car
@@ -114,7 +111,7 @@ def gstreamer_pipeline(
     )
 
 def lineDetection(image, y_begin, y_final, width, threshold, minLineLength, maxLineGap):
-    #Threshold: The minimum number of intersections to "*detect*" a line
+    #Threshold: The minimum number of intersections to "detect" a line
     section = numpy.array([
         [(0,y_begin),(0, y_final),(width,y_final),(width, y_begin)]
         ])
@@ -335,13 +332,13 @@ def runMotors():
 
 def runIot():
     client = connect_mqtt()
-    client.loop_start()       
+    client.loop_start()
+    publishData(client)       
 
 stop = False
-runIot()
 thread_camera = threading.Thread(target=runCamera)
 thread_motors = threading.Thread(target=runMotors)
-thread_iot = threading.Thread(target=sendIoT)
+thread_iot = threading.Thread(target=runIot)
 thread_camera.start()
 thread_motors.start()
 thread_iot.start()
