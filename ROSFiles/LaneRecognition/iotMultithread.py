@@ -16,7 +16,7 @@ from paho.mqtt import client as mqtt_client
 car = NvidiaRacecar()
 car.steering = 0
 car.steering_gain = 0.5
-car.steering_offset = 0.1
+car.steering_offset = -0.1
 car.throttle = 0
 car.throttle_gain = 1
 
@@ -48,10 +48,10 @@ def publishData(client):
 
 def motors_movement(throttle, steering):
     global car
-    if steering > 1:
-        steering = 1
-    elif steering < -1:
-        steering = -1
+    if steering > 0.8:
+        steering = 0.8
+    elif steering < -0.8:
+        steering = -0.8
     if throttle > 1:
         throttle = 1
     elif throttle < -1:
