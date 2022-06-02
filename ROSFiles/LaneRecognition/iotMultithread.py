@@ -41,9 +41,9 @@ def connect_mqtt():
 
 def publishData(client):
     while True:
-        client.publish(topic1, car.steering)
-        client.publish(topic2, car.throttle)
-        client.publish(topic3, currentError)
+        client.publish(topic1, int(car.steering))
+        client.publish(topic2, int(car.throttle))
+        client.publish(topic3, int(currentError))
         time.sleep(1)
 
 def motors_movement(throttle, steering):
