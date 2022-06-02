@@ -328,7 +328,7 @@ def runMotors():
                 time_analysis = current_analysis - last_analysis
                 print("Total analysis time: ", time_analysis)
 
-        time.sleep(0.1)
+        time.sleep(0.05)
 
 def runIot():
     client = connect_mqtt()
