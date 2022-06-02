@@ -73,7 +73,7 @@ def control(error):
     secondError = currentError
     currentError = error
     
-    k_proportional = 1/150
+    k_proportional = 1/250
     k_derivative = 1/500    
     
     derivative = (currentError - thirdError)
