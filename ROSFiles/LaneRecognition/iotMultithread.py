@@ -44,14 +44,14 @@ def publishData(client):
         client.publish(topic1, int(car.steering*100))
         client.publish(topic2, int(car.throttle*100))
         client.publish(topic3, int(currentError))
-        time.sleep(0.1)
+        time.sleep(0.5)
 
 def motors_movement(throttle, steering):
     global car
-    if steering > 0.8:
-        steering = 0.8
-    elif steering < -0.8:
-        steering = -0.8
+    if steering > 0.9:
+        steering = 0.9
+    elif steering < -0.9:
+        steering = -0.9
     if throttle > 1:
         throttle = 1
     elif throttle < -1:
