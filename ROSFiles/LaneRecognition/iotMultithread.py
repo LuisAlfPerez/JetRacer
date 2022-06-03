@@ -40,7 +40,7 @@ def connect_mqtt():
     return client
 
 def publishData(client):
-    last_analysis = datetime.now()
+    current_analysis = datetime.now()
     while True:
         last_analysis = current_analysis
         current_analysis = datetime.now()
