@@ -40,11 +40,16 @@ def connect_mqtt():
     return client
 
 def publishData(client):
+    last_analysis = datetime.now()
     while True:
+        last_analysis = current_analysis
+        current_analysis = datetime.now()
+        time_analysis = current_analysis - last_analysis
+        print("Total publishing time: ", time_analysis)
         client.publish(topic1, int(car.steering*100))
-        client.publish(topic2, int(car.throttle*100))
+        client.publish(topic2, int(-car.throttle*100))
         client.publish(topic3, int(currentError))
-        time.sleep(0.5)
+        time.sleep(2)
 
 def motors_movement(throttle, steering):
     global car
