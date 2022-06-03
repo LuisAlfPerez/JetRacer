@@ -283,7 +283,7 @@ def runCamera():
         while stop == False:
             ret, frame = camera.read()
             date_time = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
-            cv2.imwrite('/video/'+date_time+".jpg", frame)
+            cv2.imwrite(date_time+".jpg", frame)
             last_photo = current_photo
             current_photo = datetime.now()
             time_between_captures = current_photo - last_photo
