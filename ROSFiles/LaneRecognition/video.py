@@ -282,7 +282,7 @@ def runCamera():
         keyCode = 0
         while stop == False:
             ret, frame = camera.read()
-            date_time = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+            date_time = datetime.now().strftime("%m-%d-%Y_%H-%M-%S.%f")
             cv2.imwrite(date_time+".jpg", frame)
             last_photo = current_photo
             current_photo = datetime.now()
