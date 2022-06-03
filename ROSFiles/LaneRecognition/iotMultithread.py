@@ -49,7 +49,7 @@ def publishData(client):
         client.publish(topic1, int(car.steering*100))
         client.publish(topic2, int(-car.throttle*100))
         client.publish(topic3, int(currentError))
-        time.sleep(0.5)
+        time.sleep(2)
 
 def motors_movement(throttle, steering):
     global car
