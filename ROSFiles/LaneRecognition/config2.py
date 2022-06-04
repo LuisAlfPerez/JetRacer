@@ -78,13 +78,15 @@ def control(error):
     secondError = currentError
     currentError = error
     
-    k_proportional = 1/250
-    k_derivative = 1/500     #*****************
+    k_proportional = 1/300
+    k_derivative = 1/450     #*****************
     
     derivative = (currentError - thirdError)
     
     steering = k_proportional*currentError + k_derivative * derivative
     motor = -0.18            #******************
+    if steering > 0.75 or steering < -0.75:
+        motor = -0.14
     motors_movement(motor, steering)
     return
 

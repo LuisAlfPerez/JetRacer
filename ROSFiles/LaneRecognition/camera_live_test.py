@@ -1,16 +1,96 @@
 #!/usr/bin/env python3
 
-from matplotlib import pyplot as plt
-from setupFiles.lineFunction import LineFunction
-#import rospy
-#from std_msgs.msg import Int32
+import threading
 import numpy
 import cv2
 import os
+import time
+
+from setup.nvidia_racecar import NvidiaRacecar
+from matplotlib import pyplot as plt
+from setupFiles.lineFunction import LineFunction
+from datetime import datetime
+from pynput import keyboard
+from paho.mqtt import client as mqtt_client
+
+car = NvidiaRacecar()
+car.steering = 0
+car.steering_gain = 0.5
+car.steering_offset = -0.1
+car.throttle = 0
+car.throttle_gain = 1
+
+port = 1883
+topic1 = "/Steering"
+topic2 = "/Throttle"
+topic3 = "/Error"
+ClientID = "Test"
+
+
+def connect_mqtt():
+    def on_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print("Connected to MQTT Broker!")
+        else:
+            print("Failed to connect, return code %d\n", rc)
+
+    client = mqtt_client.Client()
+    client.on_connect = on_connect
+    client.connect("localhost", port, 60)
+    return client
+
+def publishData(client):
+    current_analysis = datetime.now()
+    while True:
+        last_analysis = current_analysis
+        current_analysis = datetime.now()
+        time_analysis = current_analysis - last_analysis
+        print("Total publishing time: ", time_analysis)
+        client.publish(topic1, int(car.steering*100))
+        client.publish(topic2, int(-car.throttle*100))
+        client.publish(topic3, int(currentError))
+        time.sleep(0.25)
+
+def motors_movement(throttle, steering):
+    global car
+    if steering > 0.9:
+        steering = 0.9
+    elif steering < -0.9:
+        steering = -0.9
+    if throttle > 1:
+        throttle = 1
+    elif throttle < -1:
+        throttle = -1
+    car.steering = steering
+    car.throttle = throttle
+    return 
+
+thirdError = 0
+secondError = 0
+currentError = 0
+
+def control(error):
+    global thirdError
+    global secondError
+    global currentError
+
+    thirdError = secondError
+    secondError = currentError
+    currentError = error
+    
+    k_proportional = 1/250
+    k_derivative = 1/500    
+    
+    derivative = (currentError - thirdError)
+    
+    steering = k_proportional*currentError + k_derivative * derivative
+    motor = -0.14
+    motors_movement(0, steering)
+    return
 
 def gstreamer_pipeline(
-    capture_width=1280,
-    capture_height=720,
+    capture_width=320, #1280 #640 #320
+    capture_height=240, #720 #480 #240
     display_width=1280,
     display_height=720,
     framerate=10,
@@ -36,7 +116,7 @@ def gstreamer_pipeline(
     )
 
 def lineDetection(image, y_begin, y_final, width, threshold, minLineLength, maxLineGap):
-    #Threshold: The minimum number of intersections to "*detect*" a line
+    #Threshold: The minimum number of intersections to "detect" a line
     section = numpy.array([
         [(0,y_begin),(0, y_final),(width,y_final),(width, y_begin)]
         ])
@@ -48,7 +128,6 @@ def lineDetection(image, y_begin, y_final, width, threshold, minLineLength, maxL
 
 def simplifyLines(lines, x_begin, x_final, y_begin, y_final, tolerance):
     newLines = []
-    #print(lines.shape[0])
     for line in lines:
             x1, y1, x2, y2 = line.reshape(4)
             if newLines is not None:
@@ -59,7 +138,6 @@ def simplifyLines(lines, x_begin, x_final, y_begin, y_final, tolerance):
                         if abs(searchingFunction.calculateYValue(x_begin)-savedLines.calculateYValue(x_begin))<=tolerance and abs(searchingFunction.calculateYValue(x_final)-savedLines.calculateYValue(x_final))<=tolerance:
                             found = True
                             savedLines.checkMinAndMax(searchingFunction, y_begin, y_final)
-                            #"""
                     elif abs(searchingFunction.slope) > 1:
                         if abs(searchingFunction.calculateYValue(x_begin)-savedLines.calculateYValue(x_begin))<=tolerance*2 and abs(searchingFunction.calculateYValue(x_final)-savedLines.calculateYValue(x_final))<=tolerance*2:
                             found = True
@@ -68,7 +146,6 @@ def simplifyLines(lines, x_begin, x_final, y_begin, y_final, tolerance):
                         if abs(searchingFunction.calculateXValue(y_begin)-savedLines.calculateXValue(y_begin))<=tolerance*2 and abs(searchingFunction.calculateXValue(y_final)-savedLines.calculateXValue(y_final))<=tolerance*2:
                             found = True
                             savedLines.checkMinAndMax(searchingFunction, y_begin, y_final)
-                    #"""
                     else :
                         if abs(searchingFunction.calculateXValue(y_begin)-savedLines.calculateXValue(y_begin))<=tolerance*4 and abs(searchingFunction.calculateXValue(y_final)-savedLines.calculateXValue(y_final))<=tolerance*4:
                             found = True
@@ -80,10 +157,7 @@ def simplifyLines(lines, x_begin, x_final, y_begin, y_final, tolerance):
                 newLines.append(new_line)
     straightLines = []
     for line in newLines:
-        #print()
-        #print(line.slope)
         if abs(line.slope) > 0.25:
-            #print("se guarda")
             straightLines.append(line)
     return straightLines
 
@@ -98,14 +172,10 @@ def printLines(image, lines, width, height):
             cv2.line(lineImage, (x1, y1), (x2, y2), (255, 255, 255), 10)
     cv2.line(lineImage, (round(width/2), 0), (round(width/2), height), (127, 127, 127), 2)
     lines = cv2.addWeighted(image, 0.8, lineImage, 1,1)
-    plt.imshow(lines)
-    plt.show()
+    cv2.imshow("CSI Camera", lines)
     return lines    
 
 def fillRegion(image, lines, width, height):
-    if lines is None:
-        return
-    mask = numpy.zeros_like(image)
     refx=round(width/2)
     x1=0
     x2=width
@@ -115,17 +185,14 @@ def fillRegion(image, lines, width, height):
         for line in lines:
             if line.y_min <= y and line.y_max >= y:
                 x = line.calculateXValue(y)
-                #print("x =",x,"y =",y,"min =",line.y_min,"max =",line.y_max, "cond =",x<refx, x<x2)
                 if x < refx:
                     if x > x1:
                         x1 = x
                 else:
                     if x < x2:
                         x2 = x
-                        #print(x2)
         if y < round(height/2):
             if x1!=0 and x2!=width:
-                #print("x1 =", x1, "x2 =",x2, "y =",y)
                 cv2.line(mask, (x1, y), (x2, y), (255, 255, 255), 1)
         else:
             cv2.line(mask, (x1, y), (x2, y), (255, 255, 255), 1)
@@ -173,153 +240,125 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
                     if x < x_right_further:
                         x_right_further = x
 
-    k_closer = 0
-    k_middle = 1           #***************
-    k_further = 1          #***************
+    k_closer = 1
+    k_middle = 3 
+    k_further = 1 
 
     x_left = (k_closer*x_left_closer + k_middle*x_left_middle + k_further*x_left_further)/(k_closer+k_middle+k_further)
     x_right = (k_closer*x_right_closer + k_middle*x_right_middle + k_further*x_right_further)/(k_closer+k_middle+k_further)                
     
     distance_from_reference = int((x_right+x_left)/2-round(width/2))
+    
+    control(distance_from_reference)
 
-    print("Distance from reference: ", distance_from_reference)
+    #print("Distance from reference: ", distance_from_reference)
     return 
+
 def region_of_interest(imageReceived):
     height = imageReceived.shape[0]
     width = imageReceived.shape[1]
-    croppedImage=imageReceived
-    # fieldView = 60*2.5
-    # view = numpy.array([
-    #     [(0,200),(width/2-fieldView, 0),(width/2+fieldView, 0),(width,200),(width, height),(0, height)]
-    #     ])
-    # mask = numpy.zeros_like(croppedImage)
-    # cv2.fillPoly(mask, numpy.int32([view]), 255)
-    # croppedImage = cv2.bitwise_and(croppedImage, mask)
 
-    y_begin = 0
-    y_final = height
-    threshold = 150
-    minLineLength = 35
-    maxLineGap = 30
-    tolerance = 30
+    y_begin = 0 #150
+    y_final = height #500
+    threshold = 150 #300
+    minLineLength = 35 #35
+    maxLineGap = 50 #50
+    tolerance = 50 #50
     referenceYValueCloser = int(height*3/4) #400
     referenceYValueMiddle = int(height/2) #400
     referenceYValueFurther = int(height/4) #400
 
-    lineImage = numpy.zeros_like(croppedImage)
-    lines1 = lineDetection(croppedImage, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
-    # print(lines1)
+    lineImage = numpy.zeros_like(imageReceived)
+    lines1 = lineDetection(imageReceived, y_begin, y_final, width, threshold, minLineLength, maxLineGap)
     if lines1 is not None: 
         lines1 = simplifyLines(lines1, 0, width, y_begin, y_final, tolerance)
     distanceFromReference(lines1, width, referenceYValueCloser, referenceYValueMiddle, referenceYValueFurther)
-    refImage = fillRegion(printLines(croppedImage, lines1, width, height), lines1, width, height)
-    # plt.imshow(refImage)
-    # plt.show() 
+    printLines(imageReceived, lines1, width, height)
 
-    
-#publisher = rospy.Publisher('referenceDistance', Int32, queue_size=1)
-#rospy.init_node('vision', anonymous=True)
-#Recta
-# image = cv2.imread("05-12-2022_21-45-17.jpg")
-# image = cv2.imread("05-12-2022_21-49-43.jpg")
-# image = cv2.imread("05-12-2022_21-50-13.jpg")
-
-#Curva izquierda
-# image = cv2.imread("05-12-2022_21-47-07.jpg")
-# image = cv2.imread("05-12-2022_21-48-15.jpg")
-# image = cv2.imread("05-12-2022_21-51-17.jpg")
-
-#Curva derecha
-# image = cv2.imread("05-12-2022_21-46-13.jpg")
-# image = cv2.imread("05-12-2022_21-49-17.jpg")
-
-image = cv2.imread("06-02-2022_22-16-26.764596.jpg")
-
-
-
-height = image.shape[0]
-width = image.shape[1]
-reduced_height_up = int(4*height/9)
-reduced_height_bottom = int(7*height/9)
-
-image = image[reduced_height_up:reduced_height_bottom-1, 0:width-130-1]
-
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-blurred = cv2.GaussianBlur(gray, (9, 9), 0)
-kernelErosion = numpy.ones((2,2),numpy.uint8)
-kernelDilate = numpy.ones((15,15),numpy.uint8)
-kernelOpening = numpy.ones((3,3),numpy.uint8)
-        
-#MEAN
-threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
-erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
-dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
-openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
-region_of_interest(dilateMean)
-"""
 camera = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
-if camera.isOpened():
-    keyCode = 0
-    while keyCode != 27:
-        # Stop the program on the ESC key
-        keyCode = cv2.waitKey(30) & 0xFF
-        ret, frame = camera.read()
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (9, 9), 0)
-        kernelErosion = numpy.ones((2,2),numpy.uint8)
-        kernelDilate = numpy.ones((15,15),numpy.uint8)
-        kernelOpening = numpy.ones((3,3),numpy.uint8)
-        
-        #MEAN
-        threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
-        erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
-        dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
-        openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
-        region_of_interest(dilateMean)
-else:
-    print("Camera was not opened")
-    """
-# titles = ['Original Image', 'Gray',
-#         'GaussianBlur','Adaptive Mean Thresholding','Erosion Mean','Dilate Mean','Opening Mean']
-# images = [frame, gray, blurred, threshMean, erosionMean, dilateMean, openingMean]
-# plt.figure('JetRacer Camera')
-# for i in range(6):
-#     plt.subplot(2,3,i+1),plt.imshow(images[i],'gray')
-#     plt.title(titles[i])
-#     plt.xticks([]),plt.yticks([])
-#plt.show()
+frame = None
 
-"""
-#GAUSSIAN
-threshGaussian = cv2.adaptiveThreshold(blurred,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,49,8)
-erosionGaussian = cv2.erode(threshGaussian,kernelErosion,iterations = 3)
-dilateGaussian = cv2.dilate(erosionGaussian,kernelDilate,iterations = 1)
-openingGaussian = cv2.morphologyEx(threshGaussian, cv2.MORPH_OPEN, kernelOpening)
-titles = ['Original Image', 'Gray',
-        'GaussianBlur','Adaptive Gaussian Thresholding','Erosion Gaussian','Dilate Gaussian','Opening Gaussian']
-images = [frame, gray, blurred, threshGaussian, erosionGaussian, dilateGaussian, openingGaussian]
-plt.figure('JetRacer Camera')
-for i in range(7):
-    plt.subplot(3,3,i+1),plt.imshow(images[i],'gray')
-    plt.title(titles[i])
-    plt.xticks([]),plt.yticks([])
-#plt.show()
+def runCamera():
+    global stop
+    global frame
+    current_photo = datetime.now()
+    last_photo = datetime.now()
+    if camera.isOpened():
+        keyCode = 0
+        while stop == False:
+            ret, frame = camera.read()
+            last_photo = current_photo
+            current_photo = datetime.now()
+            time_between_captures = current_photo - last_photo
+            print("Total capture time: ", time_between_captures)
 
-#CANNY
-canny = cv2.Canny(blurred, 50, 75)
-#plt.imshow(canny)
-#plt.show() 
-#region_of_interest(canny)
-titles = ['Original Image', 'Gray',
-        'GaussianBlur','Canny']
-images = [frame, gray, blurred, canny]
-plt.figure('JetRacer Camera')
-for i in range(4):
-    plt.subplot(2,2,i+1),plt.imshow(images[i],'gray')
-    plt.title(titles[i])
-    plt.xticks([]),plt.yticks([])
-#plt.show()
-#cv2.imshow('JetRacer Camera', plt)
-#camera.release()
-"""
-cv2.destroyAllWindows()
+    else:
+        print("Camera was not opened")
+
+    cv2.destroyAllWindows()
+
+def runMotors():
+    global frame
+    global stop
+    global inUse
+    current_analysis = datetime.now()
+    last_analysis = datetime.now()
+    while stop == False:
+        if frame is not None:
+            try:
+                height = frame.shape[0]
+                width = frame.shape[1]
+                reduced_height_up = int(4*height/9)
+                reduced_height_bottom = int(7*height/9)
+                frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
+
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                blurred = cv2.GaussianBlur(gray, (9, 9), 0)
+                kernelErosion = numpy.ones((2,2),numpy.uint8)
+                kernelDilate = numpy.ones((15,15),numpy.uint8)
+                kernelOpening = numpy.ones((3,3),numpy.uint8)
+                threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
+                erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
+                dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
+                openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
+                region_of_interest(dilateMean)
+
+                last_analysis = current_analysis
+                current_analysis = datetime.now()
+                time_analysis = current_analysis - last_analysis
+                print("Total analysis time: ", time_analysis)
+            except:
+                last_analysis = current_analysis
+                current_analysis = datetime.now()
+                time_analysis = current_analysis - last_analysis
+                print("Total analysis time: ", time_analysis)
+
+        time.sleep(0.05)
+    motors_movement(0,0)
+
+def runIot():
+    client = connect_mqtt()
+    client.loop_start()
+    publishData(client)       
+
+stop = False
+thread_camera = threading.Thread(target=runCamera)
+thread_motors = threading.Thread(target=runMotors)
+thread_iot = threading.Thread(target=runIot)
+thread_camera.start()
+thread_motors.start()
+#thread_iot.start()
+
+def on_press(key):
+    global stop
+
+    try:
+        if key == keyboard.Key.esc:
+            stop = True
+    except:
+        stop = False
+
+with keyboard.Listener(
+        on_press=on_press,
+        on_release=on_press) as listener:
+    listener.join()
