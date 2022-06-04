@@ -305,7 +305,6 @@ def runMotors():
     current_analysis = datetime.now()
     last_analysis = datetime.now()
     if frame is not None:
-        try:
             height = frame.shape[0]
             width = frame.shape[1]
             reduced_height_up = int(4*height/9)
@@ -323,11 +322,6 @@ def runMotors():
             openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
             region_of_interest(dilateMean)
 
-            last_analysis = current_analysis
-            current_analysis = datetime.now()
-            time_analysis = current_analysis - last_analysis
-            print("Total analysis time: ", time_analysis)
-        except:
             last_analysis = current_analysis
             current_analysis = datetime.now()
             time_analysis = current_analysis - last_analysis
