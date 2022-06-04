@@ -56,7 +56,7 @@ def control(error):
     motor = 0
     motors_movement(motor, steering)
     return
-    
+
 def gstreamer_pipeline(
     capture_width=320, #1280 #640 #320
     capture_height=240, #720 #480 #240
@@ -217,6 +217,7 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
     x_right = (k_closer*x_right_closer + k_middle*x_right_middle + k_further*x_right_further)/(k_closer+k_middle+k_further)                
     
     distance_from_reference = int((x_right+x_left)/2-round(width/2))
+    control(distance_from_reference)
     print("Distance from reference: ", distance_from_reference)
     return 
 
