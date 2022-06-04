@@ -223,7 +223,7 @@ def runCamera():
             width = frame.shape[1]
             reduced_height_up = int(height/2)
             reduced_height_bottom = int(5*height/6)
-            frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int((5*width)/100)-1]
+            frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int((7.5*width)/100)-1]
 
             final_time = datetime.now()
             processingtime = (final_time-begin_time)
