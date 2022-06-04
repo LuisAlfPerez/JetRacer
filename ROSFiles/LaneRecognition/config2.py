@@ -53,10 +53,10 @@ def publishData(client):
 
 def motors_movement(throttle, steering):
     global car
-    if steering > 0.9:
-        steering = 0.9
-    elif steering < -0.9:
-        steering = -0.9
+    if steering > 1:
+        steering = 1
+    elif steering < -1:
+        steering = -1
     if throttle > 1:
         throttle = 1
     elif throttle < -1:
