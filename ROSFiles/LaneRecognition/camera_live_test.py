@@ -304,38 +304,34 @@ def runMotors():
     global inUse
     current_analysis = datetime.now()
     last_analysis = datetime.now()
-    while stop == False:
-        if frame is not None:
-            try:
-                height = frame.shape[0]
-                width = frame.shape[1]
-                reduced_height_up = int(4*height/9)
-                reduced_height_bottom = int(7*height/9)
-                frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
+    if frame is not None:
+        try:
+            height = frame.shape[0]
+            width = frame.shape[1]
+            reduced_height_up = int(4*height/9)
+            reduced_height_bottom = int(7*height/9)
+            frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
 
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                blurred = cv2.GaussianBlur(gray, (9, 9), 0)
-                kernelErosion = numpy.ones((2,2),numpy.uint8)
-                kernelDilate = numpy.ones((15,15),numpy.uint8)
-                kernelOpening = numpy.ones((3,3),numpy.uint8)
-                threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
-                erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
-                dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
-                openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
-                region_of_interest(dilateMean)
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.GaussianBlur(gray, (9, 9), 0)
+            kernelErosion = numpy.ones((2,2),numpy.uint8)
+            kernelDilate = numpy.ones((15,15),numpy.uint8)
+            kernelOpening = numpy.ones((3,3),numpy.uint8)
+            threshMean = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 25, 8)
+            erosionMean = cv2.erode(threshMean,kernelErosion,iterations = 4)
+            dilateMean = cv2.dilate(erosionMean,kernelDilate,iterations = 1)
+            openingMean = cv2.morphologyEx(threshMean, cv2.MORPH_OPEN, kernelOpening)
+            region_of_interest(dilateMean)
 
-                last_analysis = current_analysis
-                current_analysis = datetime.now()
-                time_analysis = current_analysis - last_analysis
-                print("Total analysis time: ", time_analysis)
-            except:
-                last_analysis = current_analysis
-                current_analysis = datetime.now()
-                time_analysis = current_analysis - last_analysis
-                print("Total analysis time: ", time_analysis)
-
-        time.sleep(0.05)
-    motors_movement(0,0)
+            last_analysis = current_analysis
+            current_analysis = datetime.now()
+            time_analysis = current_analysis - last_analysis
+            print("Total analysis time: ", time_analysis)
+        except:
+            last_analysis = current_analysis
+            current_analysis = datetime.now()
+            time_analysis = current_analysis - last_analysis
+            print("Total analysis time: ", time_analysis)
 
 def runIot():
     client = connect_mqtt()
