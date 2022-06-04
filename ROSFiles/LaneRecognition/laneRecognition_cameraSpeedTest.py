@@ -167,7 +167,7 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
 
     k_closer = 0
     k_middle = 1
-    k_further = 0
+    k_further = 1
 
     x_left = (k_closer*x_left_closer + k_middle*x_left_middle + k_further*x_left_further)/(k_closer+k_middle+k_further)
     x_right = (k_closer*x_right_closer + k_middle*x_right_middle + k_further*x_right_further)/(k_closer+k_middle+k_further)                
@@ -184,8 +184,8 @@ def region_of_interest(imageReceived):
     y_final = height #500
     threshold = 150 #300
     minLineLength = 35 #35
-    maxLineGap = 50 #50
-    tolerance = 50 #50
+    maxLineGap = 35 #50
+    tolerance = 35 #50
     referenceYValueCloser = int(height*3/4) #400
     referenceYValueMiddle = int(height/2) #400
     referenceYValueFurther = int(height/4) #400
