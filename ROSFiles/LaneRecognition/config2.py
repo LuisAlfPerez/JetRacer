@@ -264,8 +264,8 @@ def region_of_interest(imageReceived):
     y_final = height #500
     threshold = 150 #300
     minLineLength = 35 #35
-    maxLineGap = 50 #50
-    tolerance = 50 #50
+    maxLineGap = 30 #50
+    tolerance = 20 #50
     referenceYValueCloser = int(height*3/4) #400
     referenceYValueMiddle = int(height/2) #400
     referenceYValueFurther = int(height/4) #400
@@ -312,7 +312,7 @@ def runMotors():
                 width = frame.shape[1]
                 reduced_height_up = int(4*height/9)
                 reduced_height_bottom = int(7*height/9)
-                frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
+                frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(13*width/100)-1]
 
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 blurred = cv2.GaussianBlur(gray, (9, 9), 0)
