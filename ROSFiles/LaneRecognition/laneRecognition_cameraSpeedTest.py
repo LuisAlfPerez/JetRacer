@@ -6,13 +6,57 @@ import cv2
 import os
 import rospy
 
+from setup.nvidia_racecar import NvidiaRacecar
 from matplotlib import pyplot as plt
 from setupFiles.lineFunction import LineFunction
 from std_msgs.msg import Int32
 from datetime import datetime
 from pynput import keyboard
 
+car = NvidiaRacecar()
+car.steering = 0
+car.steering_gain = 0.5
+car.steering_offset = -0.1
+car.throttle = 0
+car.throttle_gain = 1
 
+def motors_movement(throttle, steering):
+    global car
+    if steering > 0.9:
+        steering = 0.9
+    elif steering < -0.9:
+        steering = -0.9
+    if throttle > 1:
+        throttle = 1
+    elif throttle < -1:
+        throttle = -1
+    car.steering = steering
+    car.throttle = throttle
+    return 
+
+thirdError = 0
+secondError = 0
+currentError = 0
+
+def control(error):
+    global thirdError
+    global secondError
+    global currentError
+
+    thirdError = secondError
+    secondError = currentError
+    currentError = error
+    
+    k_proportional = 1/350
+    k_derivative = 1/450    
+    
+    derivative = (currentError - thirdError)
+    
+    steering = k_proportional*currentError + k_derivative * derivative
+    motor = 0
+    motors_movement(motor, steering)
+    return
+    
 def gstreamer_pipeline(
     capture_width=320, #1280 #640 #320
     capture_height=240, #720 #480 #240
