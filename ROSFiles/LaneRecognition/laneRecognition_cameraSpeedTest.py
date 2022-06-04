@@ -185,7 +185,7 @@ def region_of_interest(imageReceived):
     threshold = 150 #300
     minLineLength = 35 #35
     maxLineGap = 30 #50
-    tolerance = 30 #50
+    tolerance = 20 #50
     referenceYValueCloser = int(height*3/4) #400
     referenceYValueMiddle = int(height/2) #400
     referenceYValueFurther = int(height/4) #400
