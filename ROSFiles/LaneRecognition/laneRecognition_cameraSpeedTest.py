@@ -184,8 +184,8 @@ def region_of_interest(imageReceived):
     y_final = height #500
     threshold = 150 #300
     minLineLength = 35 #35
-    maxLineGap = 35 #50
-    tolerance = 35 #50
+    maxLineGap = 30 #50
+    tolerance = 30 #50
     referenceYValueCloser = int(height*3/4) #400
     referenceYValueMiddle = int(height/2) #400
     referenceYValueFurther = int(height/4) #400
@@ -223,7 +223,7 @@ def runCamera():
             width = frame.shape[1]
             reduced_height_up = int(height/2)
             reduced_height_bottom = int(5*height/6)
-            frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(width/10)-1]
+            frame = frame[reduced_height_up:reduced_height_bottom-1, 0:width-int(5*width/100)-1]
 
             final_time = datetime.now()
             processingtime = (final_time-begin_time)
