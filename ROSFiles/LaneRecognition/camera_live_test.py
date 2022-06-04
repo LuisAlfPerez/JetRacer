@@ -287,6 +287,7 @@ def runCamera():
         keyCode = 0
         while stop == False:
             ret, frame = camera.read()
+            runMotors()
             last_photo = current_photo
             current_photo = datetime.now()
             time_between_captures = current_photo - last_photo
@@ -342,12 +343,7 @@ def runIot():
     publishData(client)       
 
 stop = False
-thread_camera = threading.Thread(target=runCamera)
-thread_motors = threading.Thread(target=runMotors)
-thread_iot = threading.Thread(target=runIot)
-thread_camera.start()
-thread_motors.start()
-#thread_iot.start()
+runCamera()
 
 def on_press(key):
     global stop
