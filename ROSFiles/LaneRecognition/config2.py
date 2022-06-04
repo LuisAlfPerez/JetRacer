@@ -242,7 +242,7 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
                     if x < x_right_further:
                         x_right_further = x
 
-    if car.steering > 0.90 or car.steering < -0.90:
+    if car.steering > 0.75 or car.steering < -0.90:
         k_closer = 1
         k_middle = 1
         k_further = 0
