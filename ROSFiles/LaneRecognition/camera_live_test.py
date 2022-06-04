@@ -280,14 +280,13 @@ frame = None
 
 def runCamera():
     global stop
-    global frame
     current_photo = datetime.now()
     last_photo = datetime.now()
     if camera.isOpened():
         keyCode = 0
         while stop == False:
             ret, frame = camera.read()
-            runMotors()
+            runMotors(frame)
             last_photo = current_photo
             current_photo = datetime.now()
             time_between_captures = current_photo - last_photo
@@ -298,10 +297,8 @@ def runCamera():
 
     cv2.destroyAllWindows()
 
-def runMotors():
-    global frame
+def runMotors(frame):
     global stop
-    global inUse
     current_analysis = datetime.now()
     last_analysis = datetime.now()
     if frame is not None:
