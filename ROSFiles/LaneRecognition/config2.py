@@ -78,13 +78,13 @@ def control(error):
     secondError = currentError
     currentError = error
     
-    k_proportional = 1/250
-    k_derivative = 1/500    
+    k_proportional = 1/350
+    k_derivative = 1/250     #*****************
     
     derivative = (currentError - thirdError)
     
     steering = k_proportional*currentError + k_derivative * derivative
-    motor = -0.14
+    motor = -0.18            #******************
     motors_movement(motor, steering)
     return
 
@@ -241,8 +241,8 @@ def distanceFromReference(lines, width, referenceValueCloser, referenceValueMidd
                         x_right_further = x
 
     k_closer = 1
-    k_middle = 3 
-    k_further = 1 
+    k_middle = 3           #***************
+    k_further = 3          #***************
 
     x_left = (k_closer*x_left_closer + k_middle*x_left_middle + k_further*x_left_further)/(k_closer+k_middle+k_further)
     x_right = (k_closer*x_right_closer + k_middle*x_right_middle + k_further*x_right_further)/(k_closer+k_middle+k_further)                
